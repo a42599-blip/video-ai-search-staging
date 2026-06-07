@@ -28,18 +28,18 @@ async def expand_keywords(keyword):
 async def search_youtube(kw, count=8):
     results = []
     try:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         with yt_dlp.YoutubeDL({"quiet":True,"no_warnings":True}) as ydl:
             info = await loop.run_in_executor(None, lambda: ydl.extract_info(f"ytsearch{count}:{kw}", download=False))
             if info and "entries" in info:
                 for e in info["entries"][:count]:
                     if e:
-                        thumb = e.get("thumbnail","")
                         results.append({
                             "id": e.get("id",""), "title": e.get("title",""),
-                            "author": e.get("uploader",""), "thumbnail": thumb,
+                            "author": e.get("uploader",""), "thumbnail": e.get("thumbnail",""),
                             "url": f"https://youtu.be/{e.get('id','')}", "platform":"YouTube"})
-    except: pass
+    except Exception as ex:
+        print(f"[YT Search Error] {ex}")
     return results
 
 async def search_bilibili(kw, count=8):
