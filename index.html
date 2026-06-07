@@ -950,6 +950,12 @@ async function doImgSearch(){
   logActivity({type:'search_image',platform:plt});
   document.getElementById('btn-is').disabled=true;
   setSt('img','<span class="spin"></span>AI 識別圖片中...');
+  // Clear previous text search results
+  results=[]; sel.clear(); updBar();
+  document.getElementById('g-results').innerHTML='';
+  // Hide text search status bars
+  const st=document.getElementById('search-status'); if(st) st.remove();
+  const ts=document.getElementById('top-search-status'); if(ts) ts.style.display='none';
   hideResults();
   try{
     const fd=new FormData(); fd.append('file',imgFile); fd.append('platform',plt); fd.append('count',6);

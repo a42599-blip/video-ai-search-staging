@@ -77,7 +77,7 @@ async def search(keyword: str = Form(...), platforms: str = Form("all")):
         kws = await expand_keywords(kw)
         kws = kws[:2]  # Limit to 2 keywords max for speed
     
-    sel = list(PLATFORMS.keys()) if platforms=="all" else [p for p in platforms.split(",") if p in PLATFORMS]
+    sel = list(PLATFORMS.keys()) if platforms=="all" else [p for p in platforms.split(",") if p.strip().lower() in PLATFORMS]
     all_r, seen = [], set()
     for k in kws:
         for r in await asyncio.gather(*[PLATFORMS[p](k, 8) for p in sel], return_exceptions=True):
@@ -97,7 +97,71 @@ async def search_by_image(file: UploadFile = File(...)):
             from PIL import Image
             model, processor = clip.load("ViT-B/32", device="cpu")
             img = processor(Image.open(io.BytesIO(image_bytes)).convert("RGB")).unsqueeze(0)
-            clip_desc = ["a handbag","a backpack","shoes","a dress","a shirt","a jacket","a hat","watch","a phone","a laptop","a car","a cat","a dog","food","a book","furniture","makeup","sports","beach","mountain","cosmetics","jewelry","sunglasses","camera","headphones","bicycle","pizza","cake","plant","guitar","tablet","toys"]
+            clip_desc = [
+                # Furniture & Home
+                "a chair","an armchair","a sofa","a couch","a table","a desk","a bed","a bookshelf",
+                "a cabinet","a drawer","a lamp","a rug","a curtain","a pillow","a mirror",
+                "a door","a window","a wall","a floor","a ceiling","a staircase",
+                # Electronics
+                "a smartphone","a mobile phone","an iPhone","an Android phone","a laptop","a computer",
+                "a tablet","an iPad","a TV","a monitor","a screen","a keyboard","a mouse",
+                "headphones","earphones","a speaker","a camera","a webcam","a printer",
+                # Clothing & Accessories
+                "a dress","a shirt","a t-shirt","a blouse","a jacket","a coat","a sweater","a hoodie",
+                "a pair of pants","jeans","shorts","a skirt","a suit","a tie",
+                "shoes","sneakers","boots","sandals","high heels","slippers",
+                "a hat","a cap","a scarf","gloves","sunglasses","a watch","a necklace",
+                "a ring","earrings","a bracelet","a backpack","a handbag","a purse","a wallet","a suitcase",
+                # Food & Drink
+                "pizza","a burger","a sandwich","a hot dog","french fries","fried chicken",
+                "pasta","spaghetti","rice","noodles","soup","salad",
+                "a cake","a cupcake","a cookie","a donut","ice cream","chocolate","candy",
+                "an apple","a banana","an orange","a strawberry","a watermelon","grapes",
+                "coffee","tea","juice","water","a bottle","a glass","a cup","a bowl","a plate",
+                # Animals
+                "a cat","a dog","a bird","a fish","a horse","a cow","a pig","a sheep",
+                "a rabbit","a hamster","a turtle","a snake","a lizard","a frog",
+                "a butterfly","a bee","a ladybug","a spider","an ant",
+                # Vehicles
+                "a car","a truck","a bus","a motorcycle","a bicycle","a scooter",
+                "a train","a subway","an airplane","a helicopter","a boat","a ship",
+                # Sports & Activities
+                "a ball","a soccer ball","a basketball","a baseball","a tennis ball",
+                "a football","a volleyball","a golf ball","a bowling ball",
+                "a racket","a bat","a glove","a helmet","a skateboard","a surfboard",
+                "a bicycle","a gym","a workout","yoga","running","swimming",
+                # Nature & Outdoors
+                "a tree","a flower","a plant","a leaf","grass","a forest",
+                "a mountain","a hill","a river","a lake","an ocean","a beach","a waterfall",
+                "a garden","a park","a path","a trail",
+                # Buildings & Places
+                "a house","a building","an apartment","a school","a hospital","a church",
+                "a store","a restaurant","a cafe","a office","a factory",
+                "a bridge","a road","a street","a highway","a parking lot",
+                # People & Body
+                "a person","a man","a woman","a child","a baby","a couple","a family",
+                "a hand","an eye","a face","a smile","a portrait","a selfie",
+                "a group of people","a crowd","a dancer","a singer","a musician",
+                # Beauty & Personal Care
+                "makeup","lipstick","foundation","eyeshadow","mascara","perfume",
+                "cosmetics","a mirror","a brush","a comb","scissors",
+                # Stationery & Office
+                "a book","a notebook","a magazine","a newspaper","a pen","a pencil",
+                "scissors","a ruler","a stapler","paper","a document","a folder",
+                # Toys & Hobbies
+                "a toy","a doll","a teddy bear","a lego","a puzzle","a board game",
+                "a video game","a controller","a guitar","a piano","a drum","a microphone",
+                # Tools & Household
+                "a hammer","a screwdriver","a wrench","a drill","a saw","a knife",
+                "a spoon","a fork","a pot","a pan","a cutting board",
+                # Bags & Luggage
+                "a backpack","a handbag","a tote bag","a duffel bag","a suitcase",
+                # Miscellaneous
+                "a gift","a present","a box","a bag","a basket",
+                "a clock","a calendar","a map","a sign","a poster","a painting",
+                "a fire","a candle","a light bulb","a key","a lock",
+                "a umbrella","a trash can","a bucket","a ladder",
+            ]
             with torch.no_grad():
                 sim = (100.0 * model.encode_image(img) @ model.encode_text(clip.tokenize(clip_desc)).T).softmax(dim=-1)
                 text = clip_desc[sim[0].argmax().item()]
