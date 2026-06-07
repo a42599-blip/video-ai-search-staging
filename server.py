@@ -270,7 +270,10 @@ async def _search_youtube_api(keyword: str, count: int = YOUTUBE_DEFAULT_COUNT) 
 
 # ── YouTube 統一搜尋：Piped → Data API v3 → yt-dlp ──────────
 async def _search_youtube(keyword: str, count: int = YOUTUBE_DEFAULT_COUNT, loop=None) -> list:
-    # Direct yt-dlp (Piped/API key blocked from Railway)
+    # Priority: 1. API Key 2. yt-dlp fallback
+    results = await _search_youtube_api(keyword, count)
+    if results:
+        return results
     if loop is None:
         loop = asyncio.get_event_loop()
     prefix = SEARCH_MAP["YouTube"].format(n=count, q=keyword)
