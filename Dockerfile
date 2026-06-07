@@ -17,7 +17,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY server.py .
 COPY index.html .
 COPY search_module.py .
-COPY crawlers/ ./crawlers/
 RUN mkdir -p downloads
 
 CMD uvicorn server:app --host 0.0.0.0 --port ${PORT:-8080}
