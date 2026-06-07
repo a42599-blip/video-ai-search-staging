@@ -270,12 +270,7 @@ async def _search_youtube_api(keyword: str, count: int = YOUTUBE_DEFAULT_COUNT) 
 
 # ── YouTube 統一搜尋：Piped → Data API v3 → yt-dlp ──────────
 async def _search_youtube(keyword: str, count: int = YOUTUBE_DEFAULT_COUNT, loop=None) -> list:
-    results = await _search_piped(keyword, count)
-    if results:
-        return results
-    results = await _search_youtube_api(keyword, count)
-    if results:
-        return results
+    # Direct yt-dlp (Piped/API key blocked from Railway)
     if loop is None:
         loop = asyncio.get_event_loop()
     prefix = SEARCH_MAP["YouTube"].format(n=count, q=keyword)
@@ -1154,7 +1149,7 @@ def _ytdlp_search(prefix: str, platform: str, count: int) -> list:
     except Exception:
         return []
 
-# @app.post("/api/search")  # DISABLED: use search_module instead
+@app.post("/api/search")  
 async def search(keyword: str = Form(...), platform: str = Form("YouTube"), count: int = Form(10)):
     opt = await _optimize_query(keyword)
     yt_kw = opt["youtube"]            # YouTube 版（台灣繁體 CTR 擴展）
@@ -1193,7 +1188,7 @@ async def search(keyword: str = Form(...), platform: str = Form("YouTube"), coun
     return JSONResponse({"results": results})
 
 # ── 全網搜尋 ──────────────────────────────────────────────
-# @app.post("/api/search-all")  # DISABLED: use search_module instead
+# @app.post("/api/search-all")  
 async def search_all(keyword: str = Form(...), count: int = Form(6)):
     loop = asyncio.get_event_loop()
     opt    = await _optimize_query(keyword)
@@ -1513,7 +1508,7 @@ DEFAULT_VISION_MODEL = "qwen2.5vl:7b"
 def get_vision_models():
     return JSONResponse({"models": VISION_MODELS, "default": DEFAULT_VISION_MODEL})
 
-# @app.post("/api/search-by-image")  # DISABLED: use search_module instead
+@app.post("/api/search-by-image")  
 async def search_by_image(
     file:    UploadFile = File(...),
     platform: str = Form("全網"),
