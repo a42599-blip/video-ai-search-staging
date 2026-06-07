@@ -37,7 +37,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .pb-more{background:#121212;border-color:#252525;color:#555}
 
 /* ══ SEARCH AREA ══ */
-.search-area{max-width:1000px;margin:0 auto;padding:20px 20px 0}
+.search-area{max-width:680px;margin:0 auto;padding:20px 20px 0}
 
 /* Big search input */
 .search-box{background:#0b1a18;border:1.5px solid #0d2420;border-radius:14px;padding:4px 4px 4px 16px;display:flex;align-items:center;gap:8px;margin-bottom:14px;transition:border-color .2s;box-shadow:0 4px 20px rgba(0,0,0,.3)}
@@ -950,13 +950,12 @@ async function doImgSearch(){
   logActivity({type:'search_image',platform:plt});
   document.getElementById('btn-is').disabled=true;
   setSt('img','<span class="spin"></span>AI 識別圖片中...');
-  // Clear previous text search results
+  // Clear previous results and show in same area
   results=[]; sel.clear(); updBar();
   document.getElementById('g-results').innerHTML='';
-  // Hide text search status bars
   const st=document.getElementById('search-status'); if(st) st.remove();
   const ts=document.getElementById('top-search-status'); if(ts) ts.style.display='none';
-  hideResults();
+  document.getElementById('results-wrap').style.display='block';
   try{
     const fd=new FormData(); fd.append('file',imgFile); fd.append('platform',plt); fd.append('count',6);
     const r=await fetch(API+'/api/search-by-image',{method:'POST',body:fd});
