@@ -2508,6 +2508,9 @@ def open_browser():
     time.sleep(1.5)
     webbrowser.open("http://127.0.0.1:7788")
 
+from search_module import router as search_router
+app.include_router(search_router)
+
 if __name__ == "__main__":
     threading.Thread(target=open_browser, daemon=True).start()
     uvicorn.run(app, host="0.0.0.0", port=7788)
