@@ -1,6 +1,6 @@
 """AI Search Tool - Module 1 (Text Search) + Module 2 (Image Search)"""
 import os, re, json, time, asyncio, io
-import httpx
+import httpx, yt_dlp
 from fastapi import APIRouter, UploadFile, File, Form, Query
 from fastapi.responses import JSONResponse
 
@@ -28,15 +28,17 @@ async def expand_keywords(keyword):
 async def search_youtube(kw, count=8):
     results = []
     try:
-        async with httpx.AsyncClient(timeout=8) as c:
-            r = await c.get("https://www.googleapis.com/youtube/v3/search", params={
-                "part":"snippet","q":kw,"maxResults":count,"type":"video","key":YT_API_KEY,
-                "relevanceLanguage":"zh", "regionCode":"TW"})
-        if r.status_code == 200:
-            for item in r.json().get("items",[]):
-                s = item.get("snippet",{}); vid = item.get("id",{}).get("videoId","")
-                thumb = s.get("thumbnails",{}).get("high",{}).get("url",s.get("thumbnails",{}).get("medium",{}).get("url",""))
-                results.append({"id":vid,"title":s.get("title",""),"author":s.get("channelTitle",""),"thumbnail":thumb,"url":f"https://youtu.be/{vid}","platform":"YouTube"})
+        loop = asyncio.get_event_loop()
+        with yt_dlp.YoutubeDL({"quiet":True,"no_warnings":True}) as ydl:
+            info = await loop.run_in_executor(None, lambda: ydl.extract_info(f"ytsearch{count}:{kw}", download=False))
+            if info and "entries" in info:
+                for e in info["entries"][:count]:
+                    if e:
+                        thumb = e.get("thumbnail","")
+                        results.append({
+                            "id": e.get("id",""), "title": e.get("title",""),
+                            "author": e.get("uploader",""), "thumbnail": thumb,
+                            "url": f"https://youtu.be/{e.get('id','')}", "platform":"YouTube"})
     except: pass
     return results
 
