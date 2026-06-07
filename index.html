@@ -339,6 +339,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
     <span class="pill pill-ig on" id="plt-Instagram" onclick="togglePlt('Instagram')">📸 Instagram</span>
   </div>
 
+  <!-- Search Status Bar (shown during search) -->
+  <div id="top-search-status" style="display:none;font-size:0.78rem;line-height:1.8;margin-bottom:10px"></div>
+
   <!-- 3 tool cards -->
   <div class="tool-cards">
 
@@ -864,6 +867,9 @@ async function doSearch(){
       const stEl=document.getElementById('st-'+p);
       const itemCount=(d.results||[]).length;
       if(stEl) stEl.innerHTML='✅ '+p+' '+itemCount+' 筆';
+      // Also update top status
+      const topSt=document.getElementById('top-search-status');
+      if(topSt){ topSt.style.display='block'; topSt.innerHTML='搜尋中: '+plts.map(pp=>{const se=document.getElementById('st-'+pp);return se?se.innerHTML:pp+' 等待...'}).join(' | '); }
     }catch(e){
       const stEl=document.getElementById('st-'+p);
       if(stEl) stEl.innerHTML='❌ '+p+' 失敗';
@@ -890,6 +896,9 @@ async function doSearch(){
   summaryHtml += ' <span style="color:#94a3b8">共 <b style="color:#5eead4">'+totalFound+'</b> 筆結果</span>';
   summaryHtml += '</div>';
   g.insertAdjacentHTML('beforeend', summaryHtml);
+  // Update top status with final summary
+  const topSt=document.getElementById('top-search-status');
+  if(topSt){ topSt.style.display='block'; topSt.innerHTML='✅ 搜尋完成: '+plts.map(pp=>{const se=document.getElementById('st-'+pp);return se?se.innerHTML:pp+' 0筆'}).join(' | '); }
   if(!results.length){ g.innerHTML='<div class="st" style="grid-column:1/-1">沒有找到相關影片</div>'; document.getElementById('btn-s').disabled=false; return; }
 
   // ── 多因子相關度排序 ──
