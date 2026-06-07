@@ -40,7 +40,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .search-area{max-width:680px;margin:0 auto;padding:20px 20px 0}
 
 /* Big search input */
-.search-box{background:#0b1a18;border:1.5px solid #0d2420;border-radius:14px;padding:4px 4px 4px 16px;display:flex;align-items:center;gap:8px;margin-bottom:14px;transition:border-color .2s;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.search-box{background:#0b1a18;border:1.5px solid #0d2420;border-radius:14px;padding:4px 4px 4px 16px;display:flex;align-items:center;gap:8px;margin-bottom:14px;transition:border-color .2s;box-shadow:0 4px 20px rgba(0,0,0,.3);max-width:640px;margin-left:auto;margin-right:auto}
 .search-box:focus-within{border-color:#0d9488;box-shadow:0 4px 20px rgba(13,148,136,.15)}
 .search-box input{flex:1;background:none;border:none;outline:none;color:#e2eeee;font-size:1rem;padding:10px 0;min-width:0}
 .search-box input::placeholder{color:#1d4a45}
@@ -83,8 +83,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .dy-note{font-size:0.72rem;color:#fcd34d;padding:7px 12px;background:#1c1400;border:1px solid #78350f;border-radius:8px;margin-bottom:10px;line-height:1.5}
 
 /* ══ 3 TOOL CARDS ══ */
-.tool-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
-.tcard{background:linear-gradient(160deg,#0b1a18,#081410);border:1px solid #0d2420;border-radius:14px;overflow:hidden;transition:all .2s;position:relative}
+.tool-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;width:100%;max-width:640px;margin-left:auto;margin-right:auto}
+.tcard{background:linear-gradient(160deg,#0b1a18,#081410);border:1px solid #0d2420;border-radius:14px;overflow:hidden;transition:all .2s;position:relative;width:100%}
 .tcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
 .tcard.c-teal::before{background:linear-gradient(90deg,#0d9488,#14b8a6)}
 .tcard.c-purple::before{background:linear-gradient(90deg,#6366f1,#8b5cf6)}
@@ -137,7 +137,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .kw-badge{display:inline-block;background:linear-gradient(135deg,#042f2e,#065f46);color:#5eead4;padding:3px 12px;border-radius:16px;font-size:0.72rem;margin-bottom:8px;border:1px solid #0d9488}
 
 /* ══ RESULTS ══ */
-.results-wrap{max-width:680px;margin:0 auto;padding:0 20px 100px}
+.results-wrap{max-width:640px;margin:0 auto;padding:0 20px 100px}
 .results-label{font-size:0.7rem;color:#1d4a45;letter-spacing:.5px;text-transform:uppercase;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .results-label::after{content:'';flex:1;height:1px;background:#0d2420}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px}
@@ -963,7 +963,7 @@ async function doImgSearch(){
     if(d.error){ setSt('img',d.error); return; }
     // Use same results display as text search
     results=d.results||[]; setSt('img','');
-    hideResults();
+    // hideResults();  // REMOVED: was hiding results
     document.getElementById('results-label').textContent='圖片搜尋結果：'+results.length+' 筆 ('+d.elapsed+'秒)';
     document.getElementById('kw-badge-wrap').innerHTML=d.clip_text?'<span class="kw-badge">AI 辨識: '+esc(d.clip_text)+'</span>':'';
     document.getElementById('results-wrap').style.display='block';
