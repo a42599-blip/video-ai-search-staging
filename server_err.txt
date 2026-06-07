@@ -1,0 +1,193 @@
+INFO:     Started server process [84224]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:7788 (Press CTRL+C to quit)
+Future exception was never retrieved
+future: <Future finished exception=TargetClosedError('Target page, context or browser has been closed')>
+playwright._impl._errors.TargetClosedError: Target page, context or browser has been closed
+ERROR:    Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 409, in run_asgi
+  |     result = await app(  # type: ignore[func-returns-value]
+  |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+  |     return await self.app(scope, receive, send)
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+  |     await super().__call__(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\applications.py", line 116, in __call__
+  |     await self.middleware_stack(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+  |     raise exc
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+  |     await self.app(scope, receive, _send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\middleware\cors.py", line 83, in __call__
+  |     await self.app(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+  |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\_exception_handler.py", line 55, in wrapped_app
+  |     raise exc
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\_exception_handler.py", line 44, in wrapped_app
+  |     await app(scope, receive, sender)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\routing.py", line 746, in __call__
+  |     await route.handle(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\routing.py", line 288, in handle
+  |     await self.app(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\routing.py", line 75, in app
+  |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\_exception_handler.py", line 55, in wrapped_app
+  |     raise exc
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\_exception_handler.py", line 44, in wrapped_app
+  |     await app(scope, receive, sender)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\routing.py", line 73, in app
+  |     await response(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\responses.py", line 252, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |                ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\anyio\_backends\_asyncio.py", line 799, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_transports\default.py", line 72, in map_httpcore_exceptions
+    |     yield
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_transports\default.py", line 257, in __aiter__
+    |     async for part in self._httpcore_stream:
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpcore\_async\connection_pool.py", line 407, in __aiter__
+    |     raise exc from None
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpcore\_async\connection_pool.py", line 403, in __aiter__
+    |     async for part in self._stream:
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpcore\_async\http11.py", line 342, in __aiter__
+    |     raise exc
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpcore\_async\http11.py", line 334, in __aiter__
+    |     async for chunk in self._connection._receive_response_body(**kwargs):
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpcore\_async\http11.py", line 203, in _receive_response_body
+    |     event = await self._receive_event(timeout=timeout)
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpcore\_async\http11.py", line 213, in _receive_event
+    |     with map_exceptions({h11.RemoteProtocolError: RemoteProtocolError}):
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(value)
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    |     raise to_exc(exc) from exc
+    | httpcore.RemoteProtocolError: peer closed connection without sending complete message body (received 521936 bytes, expected 156704078)
+    | 
+    | The above exception was the direct cause of the following exception:
+    | 
+    | Traceback (most recent call last):
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\responses.py", line 255, in wrap
+    |     await func()
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\responses.py", line 244, in stream_response
+    |     async for chunk in self.body_iterator:
+    |   File "D:\影片搜尋下載工具\server.py", line 1208, in _stream
+    |     dl_url = f"/下載影片/{fname}" if Path(saved_dir) == DOWNLOAD_DIR else None
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_models.py", line 931, in aiter_bytes
+    |     async for raw_bytes in self.aiter_raw():
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_models.py", line 989, in aiter_raw
+    |     async for raw_stream_bytes in self.stream:
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_client.py", line 150, in __aiter__
+    |     async for chunk in self._stream:
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_transports\default.py", line 256, in __aiter__
+    |     with map_httpcore_exceptions():
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(value)
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_transports\default.py", line 89, in map_httpcore_exceptions
+    |     raise mapped_exc(message) from exc
+    | httpx.RemoteProtocolError: peer closed connection without sending complete message body (received 521936 bytes, expected 156704078)
+    +------------------------------------
+ERROR:    Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 409, in run_asgi
+  |     result = await app(  # type: ignore[func-returns-value]
+  |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+  |     return await self.app(scope, receive, send)
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+  |     await super().__call__(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\applications.py", line 116, in __call__
+  |     await self.middleware_stack(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+  |     raise exc
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+  |     await self.app(scope, receive, _send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\middleware\cors.py", line 83, in __call__
+  |     await self.app(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+  |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\_exception_handler.py", line 55, in wrapped_app
+  |     raise exc
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\_exception_handler.py", line 44, in wrapped_app
+  |     await app(scope, receive, sender)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\routing.py", line 746, in __call__
+  |     await route.handle(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\routing.py", line 288, in handle
+  |     await self.app(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\routing.py", line 75, in app
+  |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\_exception_handler.py", line 55, in wrapped_app
+  |     raise exc
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\_exception_handler.py", line 44, in wrapped_app
+  |     await app(scope, receive, sender)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\routing.py", line 73, in app
+  |     await response(scope, receive, send)
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\responses.py", line 252, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |                ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\anyio\_backends\_asyncio.py", line 799, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_transports\default.py", line 72, in map_httpcore_exceptions
+    |     yield
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_transports\default.py", line 257, in __aiter__
+    |     async for part in self._httpcore_stream:
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpcore\_async\connection_pool.py", line 407, in __aiter__
+    |     raise exc from None
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpcore\_async\connection_pool.py", line 403, in __aiter__
+    |     async for part in self._stream:
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpcore\_async\http11.py", line 342, in __aiter__
+    |     raise exc
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpcore\_async\http11.py", line 334, in __aiter__
+    |     async for chunk in self._connection._receive_response_body(**kwargs):
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpcore\_async\http11.py", line 203, in _receive_response_body
+    |     event = await self._receive_event(timeout=timeout)
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpcore\_async\http11.py", line 213, in _receive_event
+    |     with map_exceptions({h11.RemoteProtocolError: RemoteProtocolError}):
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(value)
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    |     raise to_exc(exc) from exc
+    | httpcore.RemoteProtocolError: peer closed connection without sending complete message body (received 425054 bytes, expected 3739592)
+    | 
+    | The above exception was the direct cause of the following exception:
+    | 
+    | Traceback (most recent call last):
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\responses.py", line 255, in wrap
+    |     await func()
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\responses.py", line 244, in stream_response
+    |     async for chunk in self.body_iterator:
+    |   File "D:\影片搜尋下載工具\server.py", line 1208, in _stream
+    |     def _dl():
+    |             ^^
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_models.py", line 931, in aiter_bytes
+    |     async for raw_bytes in self.aiter_raw():
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_models.py", line 989, in aiter_raw
+    |     async for raw_stream_bytes in self.stream:
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_client.py", line 150, in __aiter__
+    |     async for chunk in self._stream:
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_transports\default.py", line 256, in __aiter__
+    |     with map_httpcore_exceptions():
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(value)
+    |   File "C:\Users\USER\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_transports\default.py", line 89, in map_httpcore_exceptions
+    |     raise mapped_exc(message) from exc
+    | httpx.RemoteProtocolError: peer closed connection without sending complete message body (received 425054 bytes, expected 3739592)
+    +------------------------------------

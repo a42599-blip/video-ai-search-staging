@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>管理員設定</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#050d0c;color:#e2eeee;min-height:100vh;padding:30px 20px}
+.wrap{max-width:560px;margin:0 auto}
+h1{font-size:1.2rem;color:#5eead4;margin-bottom:24px}
+.card{background:#0b1a18;border:1px solid #0d2420;border-radius:12px;padding:20px;margin-bottom:16px}
+.card-title{font-size:0.85rem;color:#5eead4;font-weight:600;margin-bottom:12px}
+.info{font-size:0.75rem;color:#2d5a55;line-height:1.6;margin-bottom:10px}
+.path-display{background:#060f0f;border:1px solid #0d2420;border-radius:8px;padding:10px 14px;font-size:0.8rem;color:#0d9488;word-break:break-all;margin-bottom:10px;min-height:36px}
+.btn{border:none;border-radius:8px;padding:9px 16px;font-size:0.82rem;cursor:pointer;font-weight:600;width:100%;margin-bottom:8px}
+.btn-teal{background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff}
+.btn-red{background:#1a0505;border:1px solid #3b1515;color:#f87171}
+.btn-gray{background:#141414;border:1px solid #252525;color:#4b5563}
+.sel{width:100%;background:#060f0f;border:1px solid #0d2420;color:#e2eeee;padding:8px 12px;border-radius:8px;font-size:0.82rem;margin-bottom:8px;outline:none}
+.inp{width:100%;background:#060f0f;border:1px solid #0d2420;color:#e2eeee;padding:9px 12px;border-radius:8px;font-size:0.78rem;outline:none;font-family:monospace;resize:vertical;line-height:1.5}
+.inp:focus{border-color:#0d9488}
+.msg{font-size:0.75rem;margin-top:6px;padding:6px 10px;border-radius:6px;display:none}
+.msg.ok{background:#042f2e;border:1px solid #0d9488;color:#5eead4}
+.msg.err{background:#1a0505;border:1px solid #3b1515;color:#f87171}
+.status-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.badge{padding:4px 12px;border-radius:20px;font-size:0.72rem;font-weight:500}
+.badge.set{background:#042f2e;border:1px solid #0d9488;color:#5eead4}
+.badge.unset{background:#141414;border:1px solid #252525;color:#4b5563}
+.sep{height:1px;background:#0d2420;margin:12px 0}
+a.back{display:inline-block;color:#2d5a55;font-size:0.78rem;text-decoration:none;margin-bottom:20px}
+a.back:hover{color:#5eead4}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">← 返回主頁</a>
+  <h1>⚙️ 管理員設定</h1>
+
+  <!-- 下載路徑 -->
+  <div class="card">
+    <div class="card-title">📂 影片下載儲存位置</div>
+    <div class="info">影片下載後儲存在這個資料夾。點「選擇資料夾」用視窗點選，不需手打路徑。</div>
+    <div class="path-display" id="path-display">載入中...</div>
+    <button class="btn btn-teal" onclick="pickFolder()">📁 選擇資料夾</button>
+    <button class="btn btn-gray" onclick="resetPath()">↺ 還原預設路徑</button>
+  </div>
+
+  <!-- Cookies 設定 -->
+  <div class="card">
+    <div class="card-title">🍪 平台 Cookies（啟用抖音搜尋 + 下載）</div>
+    <div class="status-row" id="ck-status"></div>
+    <div class="info" style="background:#0d1f1a;border:1px solid #0d3320;border-radius:8px;padding:12px;margin-bottom:12px">
+      <strong style="color:#5eead4">設定步驟（每次換帳號或 cookies 過期才需要做）：</strong><br><br>
+      1. 打開 Edge 瀏覽器，安裝擴充功能 <strong style="color:#fcd34d">「Cookie-Editor」</strong><br>
+      2. 前往 <strong>douyin.com</strong>，用手機掃碼登入<br>
+      3. 點工具列的 Cookie-Editor 圖示 → 右上角點 <strong style="color:#fcd34d">Export → Export as JSON</strong><br>
+      4. 複製全部內容，貼到下方輸入框 → 點「儲存 Cookies」<br><br>
+      <span style="color:#6b7280">設定成功後，搜尋抖音關鍵字即可正常顯示結果；下載也會更穩定、有聲音。</span>
+    </div>
+    <select class="sel" id="ck-platform">
+      <option value="douyin">抖音 douyin.com（必設）</option>
+      <option value="kuaishou">快手 kuaishou.com（選設）</option>
+      <option value="tiktok">TikTok tiktok.com（選設）</option>
+    </select>
+    <textarea class="inp" id="ck-json" rows="6" placeholder='貼上 Cookie-Editor 匯出的 JSON 陣列&#10;[{"name":"sessionid","value":"abc...","domain":".douyin.com",...}, ...]'></textarea>
+    <button class="btn btn-teal" onclick="saveCookies()" style="margin-top:8px">✅ 儲存 Cookies</button>
+    <button class="btn btn-red" onclick="delCookies()">🗑️ 清除此平台 Cookies</button>
+    <div class="msg" id="ck-msg"></div>
+  </div>
+
+</div>
+
+<script>
+const API = location.origin;
+
+// ── 路徑 ──
+async function loadPath(){
+  const p = localStorage.getItem('savePath') || 'D:\\影片搜尋下載工具\\下載影片\\（預設）';
+  document.getElementById('path-display').textContent = p;
+}
+async function pickFolder(){
+  const btn = event.target; btn.disabled=true; btn.textContent='開啟視窗中...';
+  try{
+    const r = await fetch(API+'/api/pick-folder');
+    const d = await r.json();
+    if(d.path){
+      localStorage.setItem('savePath', d.path);
+      loadPath();
+      showMsg('ck-msg', '✅ 路徑已設為：'+d.path, true);
+    } else { showMsg('ck-msg','已取消',false); }
+  }catch(e){ showMsg('ck-msg','❌ 失敗：'+e.message, false); }
+  finally{ btn.disabled=false; btn.textContent='📁 選擇資料夾'; }
+}
+function resetPath(){
+  localStorage.removeItem('savePath');
+  loadPath();
+}
+
+// ── Cookies ──
+async function loadCookieStatus(){
+  try{
+    const r = await fetch(API+'/api/cookies/status');
+    const d = await r.json();
+    const names = {douyin:'抖音', kuaishou:'快手', tiktok:'TikTok'};
+    document.getElementById('ck-status').innerHTML = Object.keys(names).map(p =>
+      `<span class="badge ${d[p]>0?'set':'unset'}">${names[p]}: ${d[p]>0?d[p]+'個 ✅':'未設定'}</span>`
+    ).join('');
+  }catch(e){}
+}
+async function saveCookies(){
+  const platform = document.getElementById('ck-platform').value;
+  const json = document.getElementById('ck-json').value.trim();
+  if(!json){ showMsg('ck-msg','❌ 請先貼上 Cookies JSON',false); return; }
+  try{ JSON.parse(json); }catch(e){ showMsg('ck-msg','❌ JSON 格式錯誤',false); return; }
+  const fd = new FormData();
+  fd.append('platform', platform);
+  fd.append('cookies_json', json);
+  try{
+    const r = await fetch(API+'/api/cookies/save', {method:'POST', body:fd});
+    const d = await r.json();
+    if(d.ok){ showMsg('ck-msg','✅ 已儲存 '+d.count+' 個 Cookies',true); loadCookieStatus(); }
+    else showMsg('ck-msg','❌ '+(d.error||'儲存失敗'),false);
+  }catch(e){ showMsg('ck-msg','❌ 失敗：'+e.message,false); }
+}
+async function delCookies(){
+  const platform = document.getElementById('ck-platform').value;
+  await fetch(API+'/api/cookies/'+platform, {method:'DELETE'});
+  document.getElementById('ck-json').value = '';
+  loadCookieStatus();
+  showMsg('ck-msg','✅ 已清除',true);
+}
+
+function showMsg(id, txt, ok){
+  const el = document.getElementById(id);
+  el.textContent = txt; el.className = 'msg '+(ok?'ok':'err');
+  el.style.display = 'block';
+  setTimeout(()=>el.style.display='none', 4000);
+}
+
+loadPath();
+loadCookieStatus();
+</script>
+</body>
+</html>
