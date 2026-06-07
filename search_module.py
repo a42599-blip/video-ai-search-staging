@@ -63,7 +63,60 @@ async def search_instagram(kw, count=8):
     """Instagram search - needs IPRoyal proxy"""
     return []  # TODO: implement with IPRoyal
 
-PLATFORMS = {"youtube":search_youtube,"bilibili":search_bilibili,"facebook":search_facebook,"instagram":search_instagram}
+async def search_douyin(kw, count=8):
+    """抖音搜索"""
+    results = []
+    try:
+        headers = {"User-Agent":"Mozilla/5.0","Referer":"https://www.douyin.com/"}
+        async with httpx.AsyncClient(timeout=10, headers=headers) as c:
+            r = await c.get("https://www.douyin.com/aweme/v1/web/general/search/single/",
+                params={"keyword":kw,"type":1,"count":count,"offset":0})
+        if r.status_code == 200:
+            for item in r.json().get("data",[])[:count]:
+                v = item.get("video",{}); a = item.get("author",{})
+                results.append({"id":item.get("aweme_id",""),"title":item.get("desc",""),"author":a.get("nickname",""),
+                    "thumbnail":v.get("cover",{}).get("url_list",[""])[0],
+                    "url":f"https://www.douyin.com/video/{item.get('aweme_id','')}","platform":"抖音"})
+    except: pass
+    return results
+
+async def search_tiktok(kw, count=8):
+    """TikTok search"""
+    results = []
+    try:
+        headers = {"User-Agent":"Mozilla/5.0"}
+        async with httpx.AsyncClient(timeout=10, headers=headers) as c:
+            r = await c.get("https://www.tiktok.com/api/search/item/full/",
+                params={"keyword":kw,"count":count})
+        if r.status_code == 200:
+            for item in r.json().get("data",[])[:count]:
+                results.append({"id":item.get("id",""),"title":item.get("desc",""),
+                    "author":item.get("author",{}).get("nickname",""),
+                    "thumbnail":item.get("video",{}).get("cover",""),
+                    "url":f"https://www.tiktok.com/@{item.get('author',{}).get('unique_id','')}/video/{item.get('id','')}","platform":"TikTok"})
+    except: pass
+    return results
+
+async def search_xiaohongshu(kw, count=8):
+    """小紅書搜索"""
+    results = []
+    try:
+        headers = {"User-Agent":"Mozilla/5.0","Referer":"https://www.xiaohongshu.com/"}
+        async with httpx.AsyncClient(timeout=10, headers=headers) as c:
+            r = await c.post("https://edith.xiaohongshu.com/api/sns/web/v1/search/notes",
+                json={"keyword":kw,"page":1,"page_size":count})
+        if r.status_code == 200:
+            for item in r.json().get("data",{}).get("items",[])[:count]:
+                n = item.get("note_card",{})
+                results.append({"id":n.get("note_id",""),"title":n.get("title",""),
+                    "author":n.get("user",{}).get("nickname",""),
+                    "thumbnail":n.get("cover",{}).get("url",""),
+                    "url":f"https://www.xiaohongshu.com/explore/{n.get('note_id','')}","platform":"小紅書"})
+    except: pass
+    return results
+
+PLATFORMS = {"youtube":search_youtube,"bilibili":search_bilibili,"facebook":search_facebook,"instagram":search_instagram,
+             "douyin":search_douyin,"tiktok":search_tiktok,"xiaohongshu":search_xiaohongshu}
 
 @router.post("/search")
 async def search(keyword: str = Form(...), platforms: str = Form("all")):
@@ -171,7 +224,7 @@ async def search_by_image(file: UploadFile = File(...)):
     kws = await expand_keywords(text)
     all_r, seen = [], set()
     for kw in kws[:2]:
-        for r in await asyncio.gather(*[PLATFORMS[p](kw, 8) for p in ["youtube","bilibili"]], return_exceptions=True):
+        for r in await asyncio.gather(*[PLATFORMS[p](kw, 8) for p in ["youtube","bilibili","facebook","instagram","douyin","tiktok","xiaohongshu"]], return_exceptions=True):
             if isinstance(r, list):
                 for item in r:
                     u = item.get("url","")
