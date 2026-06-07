@@ -962,13 +962,16 @@ async function doImgSearch(){
     const r=await fetch(API+'/api/search-by-image',{method:'POST',body:fd});
     const d=await r.json();
     if(d.error){ setSt('img',d.error); return; }
+    // Use same results display as text search
     results=d.results||[]; setSt('img','');
-    document.getElementById('results-label').textContent='圖片搜尋結果：'+results.length+' 筆';
+    hideResults();
+    document.getElementById('results-label').textContent='圖片搜尋結果：'+results.length+' 筆 ('+d.elapsed+'秒)';
     document.getElementById('kw-badge-wrap').innerHTML=d.clip_text?'<span class="kw-badge">AI 辨識: '+esc(d.clip_text)+'</span>':'';
     document.getElementById('results-wrap').style.display='block';
     const g=document.getElementById('g-results');
     g.innerHTML='';
     results.forEach((v,i)=>{ g.insertAdjacentHTML('beforeend',makeCard(v,i)); });
+    document.getElementById('results-wrap').scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){ setSt('img','連線失敗：'+e.message); }
   finally{ document.getElementById('btn-is').disabled=false; }
 }
