@@ -845,6 +845,12 @@ async function doSearch(){
   document.getElementById('results-label').textContent='搜尋結果：「'+kw+'」';
   document.getElementById('kw-badge-wrap').innerHTML='';
   document.getElementById('results-wrap').style.display='block';
+  
+  // Search status bar (per platform)
+  let statusHtml = '<div id="search-status" style="margin-bottom:10px;font-size:0.78rem;line-height:1.8">';
+  plts.forEach(p => { statusHtml += '<span id="st-'+p+'" style="color:#1d4a45;margin-right:12px">⏳ '+p+' 等待中...</span>'; });
+  statusHtml += '</div>';
+  g.insertAdjacentHTML('beforeend', statusHtml);
   setSt('text',`<span class="spin"></span>搜尋中（${plts.join(' · ')}）...`);
 
   let completed=0;
@@ -855,14 +861,35 @@ async function doSearch(){
       const d=await r.json();
       if(d.need_cookies) toast('抖音未設定 Cookies，請至後台 /admin 設定',true);
       for(const v of (d.results||[])){ const i=results.length; results.push(v); g.insertAdjacentHTML('beforeend',makeCard(v,i)); }
-    }catch(e){ /* platform error, continue */ }
+      const stEl=document.getElementById('st-'+p);
+      const itemCount=(d.results||[]).length;
+      if(stEl) stEl.innerHTML='✅ '+p+' '+itemCount+' 筆';
+    }catch(e){
+      const stEl=document.getElementById('st-'+p);
+      if(stEl) stEl.innerHTML='❌ '+p+' 失敗';
+    }
     completed++;
-    const left=plts.length-completed;
-    setSt('text',left>0?`<span class="spin"></span>搜尋中（還有 ${left} 個平台進行中）...`:'');
   });
 
   await Promise.all(tasks);
   setSt('text','');
+  
+  // Search complete summary
+  let summaryHtml = '<div style="margin-top:12px;padding:8px 12px;background:#0b1a18;border:1px solid #0d2420;border-radius:8px;font-size:0.75rem">';
+  summaryHtml += '<span style="color:#5eead4">✅ 搜尋完成！</span>';
+  let totalFound = 0;
+  const statusDiv = document.getElementById('search-status');
+  if(statusDiv){
+    const spans = statusDiv.querySelectorAll('span');
+    spans.forEach(sp => {
+      const txt = sp.textContent || '';
+      const match = txt.match(/(\d+) 筆/);
+      if(match) totalFound += parseInt(match[1]);
+    });
+  }
+  summaryHtml += ' <span style="color:#94a3b8">共 <b style="color:#5eead4">'+totalFound+'</b> 筆結果</span>';
+  summaryHtml += '</div>';
+  g.insertAdjacentHTML('beforeend', summaryHtml);
   if(!results.length){ g.innerHTML='<div class="st" style="grid-column:1/-1">沒有找到相關影片</div>'; document.getElementById('btn-s').disabled=false; return; }
 
   // ── 多因子相關度排序 ──
