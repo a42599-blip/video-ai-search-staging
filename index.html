@@ -850,6 +850,7 @@ async function doSearch(){
   logActivity({type:'search_text',keyword:kw,platforms:plts});
 
   results=[]; sel.clear(); updBar();
+  searchPageToken={};
   const g=document.getElementById('g-results');
   g.innerHTML='';
   document.getElementById('results-label').textContent='搜尋結果：「'+kw+'」';
@@ -863,10 +864,11 @@ async function doSearch(){
   g.insertAdjacentHTML('beforeend', statusHtml);
   setSt('text',`<span class="spin"></span>搜尋中（${plts.join(' · ')}）...`);
 
+  let searchPageToken={};
   let completed=0;
   const tasks=plts.map(async p=>{
     try{
-      const fd=new FormData(); fd.append('keyword',kw); fd.append('count',50); fd.append('platform',p);
+      const fd=new FormData(); fd.append('keyword',kw); fd.append('count',50); fd.append('platform',p); if(searchPageToken[p]) fd.append('pageToken',searchPageToken[p]);
       const r=await fetch(API+'/api/search',{method:'POST',body:fd});
       const d=await r.json();
       if(d.need_cookies) toast('抖音未設定 Cookies，請至後台 /admin 設定',true);
@@ -874,6 +876,7 @@ async function doSearch(){
       const stEl=document.getElementById('st-'+p);
       const itemCount=(d.results||[]).length;
       if(stEl) stEl.innerHTML='✅ '+p+' '+itemCount+' 筆';
+      if(d.nextPageToken) searchPageToken[p]=d.nextPageToken;
       // Also update top status
       const topSt=document.getElementById('top-search-status');
       if(topSt){ topSt.style.display='block'; topSt.innerHTML='搜尋中: '+plts.map(pp=>{const se=document.getElementById('st-'+pp);return se?se.innerHTML:pp+' 等待...'}).join(' | '); }
@@ -957,7 +960,7 @@ async function doImgSearch(){
   const ts=document.getElementById('top-search-status'); if(ts) ts.style.display='none';
   document.getElementById('results-wrap').style.display='block';
   try{
-    const fd=new FormData(); fd.append('file',imgFile); fd.append('platform',plt); fd.append('count',6);
+    const fd=new FormData(); fd.append('file',imgFile); fd.append('platform',plt); fd.append('count',50);
     const r=await fetch(API+'/api/search-by-image',{method:'POST',body:fd});
     const d=await r.json();
     if(d.error){ setSt('img',d.error); return; }
