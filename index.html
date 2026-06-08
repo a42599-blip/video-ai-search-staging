@@ -337,11 +337,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
     <span class="pill pill-bi on" id="plt-B站" onclick="togglePlt('B站')">📺 B站</span>
     <span class="pill pill-fb on" id="plt-Facebook" onclick="togglePlt('Facebook')">👤 Facebook</span>
     <span class="pill pill-ig on" id="plt-Instagram" onclick="togglePlt('Instagram')">📸 Instagram</span>
-    <span class="pill pill-dy on" id="plt-音食" onclick="togglePlt('音食')">🎵 音食</span>
-    <span class="pill pill-tt on" id="plt-TikTok" onclick="togglePlt('TikTok')">♪ TikTok</span>
-    <span class="pill pill-xs on" id="plt-小紅書" onclick="togglePlt('小紅書')">📕 小紅書</span>
-    <span class="pill pill-fb on" id="plt-Facebook" onclick="togglePlt('Facebook')">👤 Facebook</span>
-    <span class="pill pill-ig on" id="plt-Instagram" onclick="togglePlt('Instagram')">📸 Instagram</span>
   </div>
 
   <!-- Search Status Bar (shown during search) -->
@@ -864,7 +859,7 @@ async function doSearch(){
   let completed=0;
   const tasks=plts.map(async p=>{
     try{
-      const fd=new FormData(); fd.append('keyword',kw); fd.append('count',50); fd.append('platform',p);
+      const fd=new FormData(); fd.append('keyword',kw); fd.append('count',20); fd.append('platform',p);
       const r=await fetch(API+'/api/search',{method:'POST',body:fd});
       const d=await r.json();
       if(d.need_cookies) toast('抖音未設定 Cookies，請至後台 /admin 設定',true);

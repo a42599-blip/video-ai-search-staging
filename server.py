@@ -1152,7 +1152,7 @@ def _ytdlp_search(prefix: str, platform: str, count: int) -> list:
     except Exception:
         return []
 
-# @app.post("/api/search")  # DISABLED: use search_module
+@app.post("/api/search")
 async def search(keyword: str = Form(...), platform: str = Form("YouTube"), count: int = Form(10)):
     opt = await _optimize_query(keyword)
     yt_kw = opt["youtube"]            # YouTube 版（台灣繁體 CTR 擴展）
