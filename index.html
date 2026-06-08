@@ -37,10 +37,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .pb-more{background:#121212;border-color:#252525;color:#555}
 
 /* ══ SEARCH AREA ══ */
-.search-area{max-width:680px;margin:0 auto;padding:20px 20px 0}
+.search-area{max-width:1000px;margin:0 auto;padding:20px 20px 0}
 
 /* Big search input */
-.search-box{background:#0b1a18;border:1.5px solid #0d2420;border-radius:14px;padding:4px 4px 4px 16px;display:flex;align-items:center;gap:8px;margin-bottom:14px;transition:border-color .2s;box-shadow:0 4px 20px rgba(0,0,0,.3);max-width:640px;margin-left:auto;margin-right:auto}
+.search-box{background:#0b1a18;border:1.5px solid #0d2420;border-radius:14px;padding:4px 4px 4px 16px;display:flex;align-items:center;gap:8px;margin-bottom:14px;transition:border-color .2s;box-shadow:0 4px 20px rgba(0,0,0,.3)}
 .search-box:focus-within{border-color:#0d9488;box-shadow:0 4px 20px rgba(13,148,136,.15)}
 .search-box input{flex:1;background:none;border:none;outline:none;color:#e2eeee;font-size:1rem;padding:10px 0;min-width:0}
 .search-box input::placeholder{color:#1d4a45}
@@ -57,17 +57,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .pill{display:flex;align-items:center;gap:4px;padding:5px 12px;border-radius:20px;font-size:0.75rem;font-weight:500;cursor:pointer;border:1.5px solid;transition:all .18s;user-select:none;white-space:nowrap}
 .pill.off{opacity:.28;filter:saturate(.3)}
 .pill-all{background:#0b1a18;border-color:#155e56;color:#5eead4}.pill-all.on{background:#0d3330;border-color:#14b8a6;color:#99f6e4}
-.pill-fb{background:#0a1420;border-color:#152a40;color:#5890ff}
-.pill-ig{background:#1a0a18;border-color:#3a1530;color:#f77777}
-.pill-dy{background:#140a1e;border-color:#2a1440;color:#c084fc}
-.pill-tt{background:#0a1c16;border-color:#0f3020;color:#34d399}
-.pill-xs{background:#1a1208;border-color:#3a2808;color:#fb923c}
 .pill-yt{background:#1a0a0a;border-color:#3a1515;color:#f87171}
 .pill-fb{background:#0a1420;border-color:#152a40;color:#5890ff}
 .pill-ig{background:#1a0a18;border-color:#3a1530;color:#f77777}
 .pill-dm{background:#1a1208;border-color:#3a2808;color:#fb923c}
 .pill-od{background:#0a1418;border-color:#0f2830;color:#22d3ee}
 .pill-pt{background:#181208;border-color:#302408;color:#facc15}
+.pill-fb{background:#0a1420;border-color:#152a40;color:#5890ff}
+.pill-ig{background:#1a0a18;border-color:#3a1530;color:#f77777}
+.pill-dy{background:#140a1e;border-color:#2a1440;color:#c084fc}
+.pill-xs{background:#1a1208;border-color:#3a2808;color:#fb923c}
 .pill-bi{background:#0a1220;border-color:#152040;color:#60a5fa}
 .pill-tk{background:#0a1c16;border-color:#0f3020;color:#34d399}
 .pill-ks{background:#1a1508;border-color:#3a2c10;color:#fbbf24}
@@ -83,8 +82,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .dy-note{font-size:0.72rem;color:#fcd34d;padding:7px 12px;background:#1c1400;border:1px solid #78350f;border-radius:8px;margin-bottom:10px;line-height:1.5}
 
 /* ══ 3 TOOL CARDS ══ */
-.tool-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;width:100%;max-width:640px;margin-left:auto;margin-right:auto}
-.tcard{background:linear-gradient(160deg,#0b1a18,#081410);border:1px solid #0d2420;border-radius:14px;overflow:hidden;transition:all .2s;position:relative;width:100%}
+.tool-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.tcard{background:linear-gradient(160deg,#0b1a18,#081410);border:1px solid #0d2420;border-radius:14px;overflow:hidden;transition:all .2s;position:relative}
 .tcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
 .tcard.c-teal::before{background:linear-gradient(90deg,#0d9488,#14b8a6)}
 .tcard.c-purple::before{background:linear-gradient(90deg,#6366f1,#8b5cf6)}
@@ -137,7 +136,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .kw-badge{display:inline-block;background:linear-gradient(135deg,#042f2e,#065f46);color:#5eead4;padding:3px 12px;border-radius:16px;font-size:0.72rem;margin-bottom:8px;border:1px solid #0d9488}
 
 /* ══ RESULTS ══ */
-.results-wrap{max-width:640px;margin:0 auto;padding:0 20px 100px}
+.results-wrap{max-width:1000px;margin:0 auto;padding:0 20px 100px}
 .results-label{font-size:0.7rem;color:#1d4a45;letter-spacing:.5px;text-transform:uppercase;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .results-label::after{content:'';flex:1;height:1px;background:#0d2420}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px}
@@ -339,12 +338,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
     <span class="plt-row-label">搜尋平台：</span>
     <span class="pill pill-all on" id="plt-all" onclick="toggleAll()">全選</span>
     <span class="pill pill-yt on" id="plt-YouTube" onclick="togglePlt('YouTube')">▶ YouTube</span>
+    <span class="pill pill-bi on" id="plt-B站" onclick="togglePlt('B站')">📺 B站</span>
     <span class="pill pill-fb on" id="plt-Facebook" onclick="togglePlt('Facebook')">👤 Facebook</span>
     <span class="pill pill-ig on" id="plt-Instagram" onclick="togglePlt('Instagram')">📸 Instagram</span>
     <span class="pill pill-dy on" id="plt-抖音" onclick="togglePlt('抖音')">🎵 抖音</span>
     <span class="pill pill-tt on" id="plt-TikTok" onclick="togglePlt('TikTok')">♪ TikTok</span>
     <span class="pill pill-xs on" id="plt-小紅書" onclick="togglePlt('小紅書')">📕 小紅書</span>
-    <span class="pill pill-bi on" id="plt-B站" onclick="togglePlt('B站')">📺 B站</span>
+    <span class="pill pill-fb on" id="plt-Facebook" onclick="togglePlt('Facebook')">👤 Facebook</span>
+    <span class="pill pill-ig on" id="plt-Instagram" onclick="togglePlt('Instagram')">📸 Instagram</span>
+  </div>
 
   <!-- Search Status Bar (shown during search) -->
   <div id="top-search-status" style="display:none;font-size:0.78rem;line-height:1.8;margin-bottom:10px"></div>
@@ -850,7 +852,6 @@ async function doSearch(){
   logActivity({type:'search_text',keyword:kw,platforms:plts});
 
   results=[]; sel.clear(); updBar();
-  searchPageToken={};
   const g=document.getElementById('g-results');
   g.innerHTML='';
   document.getElementById('results-label').textContent='搜尋結果：「'+kw+'」';
@@ -859,17 +860,15 @@ async function doSearch(){
   
   // Search status bar (per platform)
   let statusHtml = '<div id="search-status" style="margin-bottom:10px;font-size:0.78rem;line-height:1.8">';
-  const ALL_PLATFORMS = ['YouTube','B站','Facebook','Instagram','抖音','TikTok','小紅書'];
-  ALL_PLATFORMS.forEach(p => { statusHtml += '<span id="st-'+p+'" style="color:#1d4a45;margin-right:12px">⏳ '+p+' 等待中...</span>'; });
+  plts.forEach(p => { statusHtml += '<span id="st-'+p+'" style="color:#1d4a45;margin-right:12px">⏳ '+p+' 等待中...</span>'; });
   statusHtml += '</div>';
-  g.insertAdjacentHTML('afterbegin', statusHtml);
+  g.insertAdjacentHTML('beforeend', statusHtml);
   setSt('text',`<span class="spin"></span>搜尋中（${plts.join(' · ')}）...`);
 
-  let searchPageToken={};
   let completed=0;
   const tasks=plts.map(async p=>{
     try{
-      const fd=new FormData(); fd.append('keyword',kw); fd.append('count',50); fd.append('platform',p); if(searchPageToken[p]) fd.append('pageToken',searchPageToken[p]);
+      const fd=new FormData(); fd.append('keyword',kw); fd.append('count',50); fd.append('platform',p);
       const r=await fetch(API+'/api/search',{method:'POST',body:fd});
       const d=await r.json();
       if(d.need_cookies) toast('抖音未設定 Cookies，請至後台 /admin 設定',true);
@@ -877,10 +876,9 @@ async function doSearch(){
       const stEl=document.getElementById('st-'+p);
       const itemCount=(d.results||[]).length;
       if(stEl) stEl.innerHTML='✅ '+p+' '+itemCount+' 筆';
-      if(d.nextPageToken) searchPageToken[p]=d.nextPageToken;
       // Also update top status
       const topSt=document.getElementById('top-search-status');
-      if(topSt){ topSt.style.display='block'; topSt.innerHTML='搜尋中: '+ALL_PLATFORMS.map(pp=>{const se=document.getElementById('st-'+pp);return se?se.innerHTML:pp+' 等待...'}).join(' | '); }
+      if(topSt){ topSt.style.display='block'; topSt.innerHTML='搜尋中: '+plts.map(pp=>{const se=document.getElementById('st-'+pp);return se?se.innerHTML:pp+' 等待...'}).join(' | '); }
     }catch(e){
       const stEl=document.getElementById('st-'+p);
       if(stEl) stEl.innerHTML='❌ '+p+' 失敗';
@@ -909,7 +907,7 @@ async function doSearch(){
   g.insertAdjacentHTML('beforeend', summaryHtml);
   // Update top status with final summary
   const topSt=document.getElementById('top-search-status');
-  if(topSt){ topSt.style.display='block'; topSt.innerHTML='✅ 搜尋完成: '+ALL_PLATFORMS.map(pp=>{const se=document.getElementById('st-'+pp);return se?se.innerHTML:pp+' 0筆'}).join(' | '); }
+  if(topSt){ topSt.style.display='block'; topSt.innerHTML='✅ 搜尋完成: '+plts.map(pp=>{const se=document.getElementById('st-'+pp);return se?se.innerHTML:pp+' 0筆'}).join(' | '); }
   if(!results.length){ g.innerHTML='<div class="st" style="grid-column:1/-1">沒有找到相關影片</div>'; document.getElementById('btn-s').disabled=false; return; }
 
   // ── 多因子相關度排序 ──
@@ -954,27 +952,15 @@ async function doImgSearch(){
   logActivity({type:'search_image',platform:plt});
   document.getElementById('btn-is').disabled=true;
   setSt('img','<span class="spin"></span>AI 識別圖片中...');
-  // Clear previous results and show in same area
-  results=[]; sel.clear(); updBar();
-  document.getElementById('g-results').innerHTML='';
-  const st=document.getElementById('search-status'); if(st) st.remove();
-  const ts=document.getElementById('top-search-status'); if(ts) ts.style.display='none';
-  document.getElementById('results-wrap').style.display='block';
+  hideResults();
   try{
-    const fd=new FormData(); fd.append('file',imgFile); fd.append('platform',plt); fd.append('count',50);
+    const fd=new FormData(); fd.append('file',imgFile); fd.append('platform',plt); fd.append('count',6);
     const r=await fetch(API+'/api/search-by-image',{method:'POST',body:fd});
     const d=await r.json();
     if(d.error){ setSt('img',d.error); return; }
-    // Use same results display as text search
     results=d.results||[]; setSt('img','');
-    // hideResults();  // REMOVED: was hiding results
-    document.getElementById('results-label').textContent='圖片搜尋結果：'+results.length+' 筆 ('+d.elapsed+'秒)';
-    document.getElementById('kw-badge-wrap').innerHTML=d.clip_text?'<span class="kw-badge">AI 辨識: '+esc(d.clip_text)+'</span>':'';
-    document.getElementById('results-wrap').style.display='block';
-    const g=document.getElementById('g-results');
-    g.innerHTML='';
-    results.forEach((v,i)=>{ g.insertAdjacentHTML('beforeend',makeCard(v,i)); });
-    document.getElementById('results-wrap').scrollIntoView({behavior:'smooth',block:'start'});
+    const _badge=[]; if(d.keyword_detected)_badge.push(`AI識別：${esc(d.keyword_detected)}`); if(d.model_used)_badge.push(`模型：${esc(d.model_used)}`);
+    renderResults(results,'圖片搜尋結果',_badge.join(' · '));
   }catch(e){ setSt('img','連線失敗：'+e.message); }
   finally{ document.getElementById('btn-is').disabled=false; }
 }
