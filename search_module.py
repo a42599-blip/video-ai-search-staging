@@ -141,7 +141,7 @@ async def search(keyword: str = Form(...), platforms: str = Form("all")):
     return {"success":True,"keyword":kw,"count":len(all_r),"results":all_r[:50],"elapsed":round(time.time()-start,2)}
 
 @router.post("/search-by-image")
-async def search_by_image(file: UploadFile = File(...)):
+async def search_by_image(file: UploadFile = File(...), count: int = Form(50)):
     start = time.time()
     image_bytes = await file.read()
     text = ""
@@ -224,7 +224,7 @@ async def search_by_image(file: UploadFile = File(...)):
     kws = await expand_keywords(text)
     all_r, seen = [], set()
     for kw in kws[:2]:
-        for r in await asyncio.gather(*[PLATFORMS[p](kw, 8) for p in ["youtube","bilibili","facebook","instagram","douyin","tiktok","xiaohongshu"]], return_exceptions=True):
+        for r in await asyncio.gather(*[PLATFORMS[p](kw, count) for p in ["youtube","bilibili","facebook","instagram","douyin","tiktok","xiaohongshu"]], return_exceptions=True):
             if isinstance(r, list):
                 for item in r:
                     u = item.get("url","")
