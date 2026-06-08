@@ -63,10 +63,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .pill-dm{background:#1a1208;border-color:#3a2808;color:#fb923c}
 .pill-od{background:#0a1418;border-color:#0f2830;color:#22d3ee}
 .pill-pt{background:#181208;border-color:#302408;color:#facc15}
-.pill-fb{background:#0a1420;border-color:#152a40;color:#5890ff}
-.pill-ig{background:#1a0a18;border-color:#3a1530;color:#f77777}
-.pill-dy{background:#140a1e;border-color:#2a1440;color:#c084fc}
-.pill-xs{background:#1a1208;border-color:#3a2808;color:#fb923c}
 .pill-bi{background:#0a1220;border-color:#152040;color:#60a5fa}
 .pill-tk{background:#0a1c16;border-color:#0f3020;color:#34d399}
 .pill-ks{background:#1a1508;border-color:#3a2c10;color:#fbbf24}
@@ -341,7 +337,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
     <span class="pill pill-bi on" id="plt-B站" onclick="togglePlt('B站')">📺 B站</span>
     <span class="pill pill-fb on" id="plt-Facebook" onclick="togglePlt('Facebook')">👤 Facebook</span>
     <span class="pill pill-ig on" id="plt-Instagram" onclick="togglePlt('Instagram')">📸 Instagram</span>
-    <span class="pill pill-dy on" id="plt-抖音" onclick="togglePlt('抖音')">🎵 抖音</span>
+    <span class="pill pill-dy on" id="plt-音食" onclick="togglePlt('音食')">🎵 音食</span>
     <span class="pill pill-tt on" id="plt-TikTok" onclick="togglePlt('TikTok')">♪ TikTok</span>
     <span class="pill pill-xs on" id="plt-小紅書" onclick="togglePlt('小紅書')">📕 小紅書</span>
     <span class="pill pill-fb on" id="plt-Facebook" onclick="togglePlt('Facebook')">👤 Facebook</span>
@@ -635,7 +631,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 <script>
 const API=window.location.pathname.startsWith('/video-tool')?'/video-tool':'';
 let sel=new Set(), results=[], cur=null, imgFile=null, urlInfo=null;
-const PLTS=['YouTube','B站','Facebook','Instagram','抖音','TikTok','小紅書'];
+const PLTS=['YouTube','B站'];
 let activePlts=new Set(PLTS);
 
 // iOS navigator.share 後頁面被驅逐恢復：把之前的 URL 和預覽結果還原
