@@ -859,7 +859,8 @@ async function doSearch(){
   
   // Search status bar (per platform)
   let statusHtml = '<div id="search-status" style="margin-bottom:10px;font-size:0.78rem;line-height:1.8">';
-  plts.forEach(p => { statusHtml += '<span id="st-'+p+'" style="color:#1d4a45;margin-right:12px">⏳ '+p+' 等待中...</span>'; });
+  const ALL_PLATFORMS = ['YouTube','B站','Facebook','Instagram','抖音','TikTok','小紅書'];
+  ALL_PLATFORMS.forEach(p => { statusHtml += '<span id="st-'+p+'" style="color:#1d4a45;margin-right:12px">⏳ '+p+' 等待中...</span>'; });
   statusHtml += '</div>';
   g.insertAdjacentHTML('afterbegin', statusHtml);
   setSt('text',`<span class="spin"></span>搜尋中（${plts.join(' · ')}）...`);
@@ -879,7 +880,7 @@ async function doSearch(){
       if(d.nextPageToken) searchPageToken[p]=d.nextPageToken;
       // Also update top status
       const topSt=document.getElementById('top-search-status');
-      if(topSt){ topSt.style.display='block'; topSt.innerHTML='搜尋中: '+plts.map(pp=>{const se=document.getElementById('st-'+pp);return se?se.innerHTML:pp+' 等待...'}).join(' | '); }
+      if(topSt){ topSt.style.display='block'; topSt.innerHTML='搜尋中: '+ALL_PLATFORMS.map(pp=>{const se=document.getElementById('st-'+pp);return se?se.innerHTML:pp+' 等待...'}).join(' | '); }
     }catch(e){
       const stEl=document.getElementById('st-'+p);
       if(stEl) stEl.innerHTML='❌ '+p+' 失敗';
@@ -908,7 +909,7 @@ async function doSearch(){
   g.insertAdjacentHTML('beforeend', summaryHtml);
   // Update top status with final summary
   const topSt=document.getElementById('top-search-status');
-  if(topSt){ topSt.style.display='block'; topSt.innerHTML='✅ 搜尋完成: '+plts.map(pp=>{const se=document.getElementById('st-'+pp);return se?se.innerHTML:pp+' 0筆'}).join(' | '); }
+  if(topSt){ topSt.style.display='block'; topSt.innerHTML='✅ 搜尋完成: '+ALL_PLATFORMS.map(pp=>{const se=document.getElementById('st-'+pp);return se?se.innerHTML:pp+' 0筆'}).join(' | '); }
   if(!results.length){ g.innerHTML='<div class="st" style="grid-column:1/-1">沒有找到相關影片</div>'; document.getElementById('btn-s').disabled=false; return; }
 
   // ── 多因子相關度排序 ──
