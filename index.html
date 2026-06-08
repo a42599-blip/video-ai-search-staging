@@ -841,6 +841,8 @@ function makeCard(v,i){
 }
 
 /* ── 關鍵字搜尋（即時顯示，各平台並行+逐步插入）── */
+let searchPageToken = {};
+
 async function doSearch(){
   const kw=document.getElementById('kw').value.trim();
   if(!kw){ toast('請輸入關鍵字',true); return; }
@@ -849,6 +851,9 @@ async function doSearch(){
   const plts=[...activePlts];
   logActivity({type:'search_text',keyword:kw,platforms:plts});
 
+  // Reset pageToken on new keyword, use existing for repeat search
+  if (window._lastKw !== kw) { searchPageToken = {}; window._lastKw = kw; }
+  
   results=[]; sel.clear(); updBar();
   const g=document.getElementById('g-results');
   g.innerHTML='';
@@ -866,7 +871,7 @@ async function doSearch(){
   let completed=0;
   const tasks=plts.map(async p=>{
     try{
-      const fd=new FormData(); fd.append('keyword',kw); fd.append('count',50); fd.append('platform',p);
+      const fd=new FormData(); fd.append('keyword',kw); fd.append('count',50); fd.append('platform',p); if(searchPageToken[p]) fd.append('pageToken',searchPageToken[p]);
       const r=await fetch(API+'/api/search',{method:'POST',body:fd});
       const d=await r.json();
       if(d.need_cookies) toast('抖音未設定 Cookies，請至後台 /admin 設定',true);
@@ -874,6 +879,7 @@ async function doSearch(){
       const stEl=document.getElementById('st-'+p);
       const itemCount=(d.results||[]).length;
       if(stEl) stEl.innerHTML='✅ '+p+' '+itemCount+' 筆';
+      if(d.nextPageToken) searchPageToken[p]=d.nextPageToken;
       // Also update top status
       const topSt=document.getElementById('top-search-status');
       if(topSt){ topSt.style.display='block'; topSt.innerHTML='搜尋中: '+plts.map(pp=>{const se=document.getElementById('st-'+pp);return se?se.innerHTML:pp+' 等待...'}).join(' | '); }
@@ -957,7 +963,7 @@ async function doImgSearch(){
   const ts=document.getElementById('top-search-status'); if(ts) ts.style.display='none';
   document.getElementById('results-wrap').style.display='block';
   try{
-    const fd=new FormData(); fd.append('file',imgFile); fd.append('platform',plt); fd.append('count',50);
+    const fd=new FormData(); fd.append('file',imgFile); fd.append('platform',plt); fd.append('count',50); if(searchPageToken['img']) fd.append('pageToken',searchPageToken['img']);
     const r=await fetch(API+'/api/search-by-image',{method:'POST',body:fd});
     const d=await r.json();
     if(d.error){ setSt('img',d.error); return; }
