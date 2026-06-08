@@ -861,7 +861,7 @@ async function doSearch(){
   let statusHtml = '<div id="search-status" style="margin-bottom:10px;font-size:0.78rem;line-height:1.8">';
   plts.forEach(p => { statusHtml += '<span id="st-'+p+'" style="color:#1d4a45;margin-right:12px">⏳ '+p+' 等待中...</span>'; });
   statusHtml += '</div>';
-  g.insertAdjacentHTML('beforeend', statusHtml);
+  g.insertAdjacentHTML('afterbegin', statusHtml);
   setSt('text',`<span class="spin"></span>搜尋中（${plts.join(' · ')}）...`);
 
   let searchPageToken={};
