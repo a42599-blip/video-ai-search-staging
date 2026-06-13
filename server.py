@@ -1511,67 +1511,79 @@ DEFAULT_VISION_MODEL = "qwen2.5vl:7b"
 def get_vision_models():
     return JSONResponse({"models": VISION_MODELS, "default": DEFAULT_VISION_MODEL})
 
-@app.post("/api/search-by-image")  
-async def search_by_image(
-    file:    UploadFile = File(...),
-    platform: str = Form("全網"),
-    count:   int  = Form(999),
-    model:   str  = Form(DEFAULT_VISION_MODEL),
-):
-    import base64, httpx
+@app.get("/api/video-info")
+@app.post("/api/search-by-image")
+async def search_by_image(file: UploadFile = File(...), platform: str = Form("全網"), count: int = Form(999)):
+    import base64, httpx, json, io, time
+    start = time.time()
     contents = await file.read()
-    b64      = base64.b64encode(contents).decode()
-    keyword  = ""
+    keyword = "影片"
+    vector = None
     
-    # 嘗試用 CLIP 辨識
+    # 1. 用 CLIP 提取圖片特徵（背景執行）
     if CLIP_DATA["ready"]:
         try:
-            import io
             from PIL import Image as PILImage
-            pil_img = PILImage.open(io.BytesIO(contents)).convert("RGB")
-            img_tensor = CLIP_DATA["preprocess"](pil_img).unsqueeze(0)
+            pil = PILImage.open(io.BytesIO(contents)).convert("RGB")
+            img = CLIP_DATA["preprocess"](pil).unsqueeze(0)
             with torch.no_grad():
-                feat = CLIP_DATA["model"].encode_image(img_tensor)
-            keyword = "圖片"
-        except Exception as e:
-            print(f"[ImgSearch] CLIP error: {e}")
+                feat = CLIP_DATA["model"].encode_image(img)
+                vector = feat / feat.norm(dim=-1, keepdim=True)
+                keyword = "熱門"
+        except:
+            pass
     
-    if not keyword:
-        keyword = "影片"
-    vision_model = model if model in VISION_MODELS else DEFAULT_VISION_MODEL
-    try:
-        async with httpx.AsyncClient(timeout=60) as client:
-            resp = await client.post(OLLAMA_URL, json={
-                "model":  vision_model,
-                "prompt": (
-                    "Look at this image carefully. Output the single best YouTube search query "
-                    "that would find videos about the main subject of this image. "
-                    "Be SPECIFIC: if it's a cat playing basketball, say '貓咪打籃球' not just '貓咪'. "
-                    "If it's a person, identify who they are if possible. "
-                    "If it's a product, include the brand and model. "
-                    "Output ONLY the search query in Traditional Chinese (2-8 words), nothing else."
-                ),
-                "images": [b64],
-                "stream": False,
-                "options": {"temperature": 0.05, "num_predict": 30},
-            })
-            if resp.status_code == 200:
-                raw = resp.json().get("response", "").strip()
-                # 只取第一行，去掉模型可能多輸出的解釋
-                keyword = raw.split('\n')[0].strip().split('。')[0].strip() or keyword
-    except Exception:
-        pass
-
-    result = await search_all(keyword=keyword, count=count) if platform == "全網" \
-             else await search(keyword=keyword, platform=platform, count=count * 2)
-
-    data = json.loads(result.body)
-    data["keyword_detected"] = keyword
-    data["model_used"] = vision_model
-    return JSONResponse(data)
-
-# ── URL 預覽 ──────────────────────────────────────────────
-@app.get("/api/video-info")
+    # 2. 用關鍵字搜各平台
+    results = []
+    seen = set()
+    plats = ["YouTube", "B站", "抖音"] if platform == "全網" else [platform]
+    for p in plats:
+        try:
+            kw = keyword[:50]
+            if p == "B站":
+                rj = await _search_bilibili(kw, count)
+                items = json.loads(rj.body).get("results", []) if isinstance(rj, JSONResponse) else []
+            elif p == "抖音":
+                items = await _search_douyin(kw, count)
+            else:
+                items = await _search_youtube(kw, count)
+            for v in (items if isinstance(items, list) else []):
+                v["platform"] = p
+                uid = v.get("url", "") or v.get("id", "")
+                if uid and uid not in seen:
+                    seen.add(uid)
+                    results.append(v)
+        except:
+            pass
+    
+    # 3. 比對縮圖（如果 CLIP 有載入）
+    if vector is not None and results:
+        for v in results:
+            thumb = v.get("thumbnail", "")
+            if thumb:
+                try:
+                    async with httpx.AsyncClient(timeout=5) as c:
+                        r = await c.get(thumb)
+                        if r.status_code == 200:
+                            ti = PILImage.open(io.BytesIO(r.content)).convert("RGB")
+                            tt = CLIP_DATA["preprocess"](ti).unsqueeze(0)
+                            with torch.no_grad():
+                                tf = CLIP_DATA["model"].encode_image(tt)
+                                tf = tf / tf.norm(dim=-1, keepdim=True)
+                                sim = (vector * tf).sum().item()
+                                v["score"] = round(sim, 4)
+                except:
+                    v["score"] = 0
+            else:
+                v["score"] = 0
+        results.sort(key=lambda x: x.get("score", 0), reverse=True)
+    
+    elapsed = round(time.time() - start, 2)
+    return JSONResponse({
+        "success": True, "keyword_detected": keyword,
+        "count": len(results), "results": results[:200],
+        "clip_ready": CLIP_DATA["ready"], "elapsed": elapsed
+    })
 async def video_info(url: str):
     real_url = await resolve_short_url(url)
 
@@ -2546,4 +2558,4 @@ def _clip_worker():
         CLIP_DATA["error"] = str(e)
         print(f"[CLIP] Error: {e}")
 
-_clip_worker()
+_thr.Thread(target=_clip_worker, daemon=True).start()
