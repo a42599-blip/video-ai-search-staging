@@ -2507,6 +2507,30 @@ def open_browser():
     webbrowser.open("http://127.0.0.1:7788")
 
 from search_module import router as search_router
+CLIP_MODEL = None
+CLIP_PREPROCESS = None
+CLIP_AVAILABLE = False
+try:
+    import open_clip
+    import torch
+    CLIP_AVAILABLE = True
+except:
+    pass
+
+def get_clip():
+    global CLIP_MODEL, CLIP_PREPROCESS, CLIP_AVAILABLE
+    if CLIP_MODEL is not None:
+        return CLIP_MODEL, CLIP_PREPROCESS
+    if not CLIP_AVAILABLE:
+        return None, None
+    try:
+        CLIP_MODEL, _, CLIP_PREPROCESS = open_clip.create_model_and_transforms("ViT-L-14", pretrained="openai")
+        CLIP_MODEL.eval()
+        print("[CLIP] ViT-L-14 loaded")
+    except Exception as e:
+        CLIP_AVAILABLE = False
+        print(f"[CLIP] Error: {e}")
+    return CLIP_MODEL, CLIP_PREPROCESS
 app.include_router(search_router)
 
 if __name__ == "__main__":
