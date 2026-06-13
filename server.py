@@ -116,7 +116,7 @@ CLIP_MODEL = None
 CLIP_PREPROCESS = None
 
 @app.on_event("startup")
-may def load_clip():
+async def load_clip():
     global CLIP_MODEL, CLIP_PREPROCESS, CLIP_AVAILABLE
     if not CLIP_AVAILABLE: return
     try:
