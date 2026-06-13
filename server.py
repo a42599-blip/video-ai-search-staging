@@ -109,6 +109,7 @@ async def resolve_short_url(url: str) -> str:
     return text_url
 
 OLLAMA_URL = "http://127.0.0.1:11434/api/generate"
+GOOGLE_VISION_API_KEY = os.environ.get("GOOGLE_VISION_API_KEY", "AIzaSyB3dUrStSpMnBFIyjvUkhbL5vBr04HM7JA")
 EDGE_PATH  = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 
 app = FastAPI()
@@ -1521,37 +1522,32 @@ async def search_by_image(
     import base64, httpx
     contents = await file.read()
     b64      = base64.b64encode(contents).decode()
-    keyword  = "影片"
-    vision_model = model if model in VISION_MODELS else DEFAULT_VISION_MODEL
+    keyword  = ""
+    labels   = []
     try:
-        async with httpx.AsyncClient(timeout=60) as client:
-            resp = await client.post(OLLAMA_URL, json={
-                "model":  vision_model,
-                "prompt": (
-                    "Look at this image carefully. Output the single best YouTube search query "
-                    "that would find videos about the main subject of this image. "
-                    "Be SPECIFIC: if it's a cat playing basketball, say '貓咪打籃球' not just '貓咪'. "
-                    "If it's a person, identify who they are if possible. "
-                    "If it's a product, include the brand and model. "
-                    "Output ONLY the search query in Traditional Chinese (2-8 words), nothing else."
-                ),
-                "images": [b64],
-                "stream": False,
-                "options": {"temperature": 0.05, "num_predict": 30},
-            })
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                f"https://vision.googleapis.com/v1/images:annotate?key={GOOGLE_VISION_API_KEY}",
+                json={"requests": [{"image": {"content": b64}, "features": [{"type": "LABEL_DETECTION", "maxResults": 5}]}]}
+            )
             if resp.status_code == 200:
-                raw = resp.json().get("response", "").strip()
-                # 只取第一行，去掉模型可能多輸出的解釋
-                keyword = raw.split('\n')[0].strip().split('。')[0].strip() or keyword
-    except Exception:
-        pass
+                data = resp.json()
+                annotations = data.get("responses", [{}])[0].get("labelAnnotations", [])
+                labels = [a["description"] for a in annotations if a["score"] >= 0.7]
+                if labels:
+                    keyword = " ".join(labels[:3])
+    except Exception as e:
+        print(f"[Vision API Error] {e}")
+    
+    if not keyword:
+        keyword = "影片"
 
     result = await search_all(keyword=keyword, count=count) if platform == "全網" \
              else await search(keyword=keyword, platform=platform, count=count * 2)
 
     data = json.loads(result.body)
     data["keyword_detected"] = keyword
-    data["model_used"] = vision_model
+    data["vision_labels"] = labels
     return JSONResponse(data)
 
 # ── URL 預覽 ──────────────────────────────────────────────
