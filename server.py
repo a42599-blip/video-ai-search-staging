@@ -1521,7 +1521,23 @@ async def search_by_image(
     import base64, httpx
     contents = await file.read()
     b64      = base64.b64encode(contents).decode()
-    keyword  = "影片"
+    keyword  = ""
+    
+    # 嘗試用 CLIP 辨識
+    if CLIP_DATA["ready"]:
+        try:
+            import io
+            from PIL import Image as PILImage
+            pil_img = PILImage.open(io.BytesIO(contents)).convert("RGB")
+            img_tensor = CLIP_DATA["preprocess"](pil_img).unsqueeze(0)
+            with torch.no_grad():
+                feat = CLIP_DATA["model"].encode_image(img_tensor)
+            keyword = "圖片"
+        except Exception as e:
+            print(f"[ImgSearch] CLIP error: {e}")
+    
+    if not keyword:
+        keyword = "影片"
     vision_model = model if model in VISION_MODELS else DEFAULT_VISION_MODEL
     try:
         async with httpx.AsyncClient(timeout=60) as client:
