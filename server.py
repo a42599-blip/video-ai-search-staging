@@ -15,14 +15,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import yt_dlp
 import uvicorn
-try:
-    import open_clip
-except:
-    open_clip = None
-try:
-    import torch
-except:
-    torch = None
+import open_clip
+import torch
 from PIL import Image
 
 BASE_DIR          = Path(__file__).parent
@@ -124,7 +118,20 @@ CLIP_MODEL = None\
 CLIP_PREPROCESS = None\
 CLIP_DEVICE = "cpu"\
 @app.on_event("startup")\
-    # CLIP/OCR temporarily disabled - will re-enable after dependency resolution
+async def load_clip():\
+    global CLIP_MODEL, CLIP_PREPROCESS\
+    try:\
+        model_name = "ViT-L-14"\
+        CLIP_MODEL, _, CLIP_PREPROCESS = open_clip.create_model_and_transforms(model_name, pretrained="openai")\
+        CLIP_MODEL.eval()\
+        print(f"[CLIP] {model_name} loaded on {CLIP_DEVICE}")\
+    except Exception as e:\
+        print(f"[CLIP] Failed to load: {e}")\
+\
+# ── OCR（啟動時載入一次）──\
+OCR_READER = None\
+@app.on_event("startup")\
+async def load_ocr():\
     global OCR_READER\
     try:\
         from paddleocr import PaddleOCR\
