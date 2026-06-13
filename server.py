@@ -46,6 +46,8 @@ def _registry_get_files(device_id: str) -> set:
 
 def _load_platform_cookies() -> dict:
     """讀取使用者儲存的平台 cookies，格式 {platform: [{name,value,domain,...}]}"""
+    except Exception:
+        pass
     try:
         if COOKIES_FILE.exists():
             return json.loads(COOKIES_FILE.read_text(encoding="utf-8"))
