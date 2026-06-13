@@ -15,6 +15,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import yt_dlp
 import uvicorn
+try:
+    import open_clip
+    import torch
+    CLIP_AVAILABLE = True
+except Exception:
+    CLIP_AVAILABLE = False
 
 BASE_DIR          = Path(__file__).parent
 DOWNLOAD_DIR      = BASE_DIR / "下載影片"
@@ -105,6 +111,20 @@ async def resolve_short_url(url: str) -> str:
                 r = await c.head(text_url)
                 return str(r.url)
         except Exception:
+CLIP_AVAILABLE = False
+CLIP_MODEL = None
+CLIP_PREPROCESS = None
+
+@app.on_event("startup")
+may def load_clip():
+    global CLIP_MODEL, CLIP_PREPROCESS, CLIP_AVAILABLE
+    if not CLIP_AVAILABLE: return
+    try:
+        CLIP_MODEL, _, CLIP_PREPROCESS = open_clip.create_model_and_transforms("ViT-L-14", pretrained="openai")
+        CLIP_MODEL.eval()
+        print("[CLIP] ViT-L-14 loaded")
+    except Exception as e:
+        print(f"[CLIP] Error: {e}")
             pass
     return text_url
 
