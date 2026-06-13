@@ -15,8 +15,14 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import yt_dlp
 import uvicorn
-import open_clip
-import torch
+try:
+    import open_clip
+except:
+    open_clip = None
+try:
+    import torch
+except:
+    torch = None
 from PIL import Image
 
 BASE_DIR          = Path(__file__).parent
