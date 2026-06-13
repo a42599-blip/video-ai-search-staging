@@ -15,6 +15,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import yt_dlp
 import uvicorn
+import open_clip
+import torch
+from PIL import Image
 
 BASE_DIR          = Path(__file__).parent
 DOWNLOAD_DIR      = BASE_DIR / "下載影片"
@@ -110,6 +113,32 @@ async def resolve_short_url(url: str) -> str:
 
 OLLAMA_URL = "http://127.0.0.1:11434/api/generate"
 GOOGLE_VISION_API_KEY = os.environ.get("GOOGLE_VISION_API_KEY", "AIzaSyB3dUrStSpMnBFIyjvUkhbL5vBr04HM7JA")
+# ── CLIP 模型（啟動時載入一次）──\
+CLIP_MODEL = None\
+CLIP_PREPROCESS = None\
+CLIP_DEVICE = "cpu"\
+@app.on_event("startup")\
+async def load_clip():\
+    global CLIP_MODEL, CLIP_PREPROCESS\
+    try:\
+        model_name = "ViT-L-14"\
+        CLIP_MODEL, _, CLIP_PREPROCESS = open_clip.create_model_and_transforms(model_name, pretrained="openai")\
+        CLIP_MODEL.eval()\
+        print(f"[CLIP] {model_name} loaded on {CLIP_DEVICE}")\
+    except Exception as e:\
+        print(f"[CLIP] Failed to load: {e}")\
+\
+# ── OCR（啟動時載入一次）──\
+OCR_READER = None\
+@app.on_event("startup")\
+async def load_ocr():\
+    global OCR_READER\
+    try:\
+        from paddleocr import PaddleOCR\
+        OCR_READER = PaddleOCR(use_angle_cls=True, lang="ch", use_gpu=False)\
+        print("[OCR] PaddleOCR loaded")\
+    except Exception as e:\
+        print(f"[OCR] Failed: {e}")
 EDGE_PATH  = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 
 app = FastAPI()
@@ -1511,46 +1540,134 @@ DEFAULT_VISION_MODEL = "qwen2.5vl:7b"
 @app.get("/api/vision-models")
 def get_vision_models():
     return JSONResponse({"models": VISION_MODELS, "default": DEFAULT_VISION_MODEL})
-
-@app.post("/api/search-by-image")  
-async def search_by_image(
-    file:    UploadFile = File(...),
-    platform: str = Form("全網"),
-    count:   int  = Form(999),
-    model:   str  = Form(DEFAULT_VISION_MODEL),
-):
-    import base64, httpx
+@app.post("/api/search-by-image")
+async def search_by_image(file: UploadFile = File(...), platform: str = Form("全網"), count: int = Form(999)):
+    import base64, httpx, json, io, time, numpy as np
+    start_time = time.time()
     contents = await file.read()
-    b64      = base64.b64encode(contents).decode()
-    keyword  = ""
-    labels   = []
-    try:
-        async with httpx.AsyncClient(timeout=30) as client:
-            resp = await client.post(
-                f"https://vision.googleapis.com/v1/images:annotate?key={GOOGLE_VISION_API_KEY}",
-                json={"requests": [{"image": {"content": b64}, "features": [{"type": "LABEL_DETECTION", "maxResults": 5}]}]}
-            )
-            if resp.status_code == 200:
-                data = resp.json()
-                annotations = data.get("responses", [{}])[0].get("labelAnnotations", [])
-                labels = [a["description"] for a in annotations if a["score"] >= 0.7]
-                if labels:
-                    keyword = " ".join(labels[:3])
-    except Exception as e:
-        print(f"[Vision API Error] {e}")
+    b64 = base64.b64encode(contents).decode()
     
-    if not keyword:
-        keyword = "影片"
+    # ── 1. CLIP 提取圖片特徵向量 + 文字描述 ──
+    keyword = ""
+    clip_desc = ""
+    labels = []
+    img_tensor = None
+    try:
+        from PIL import Image as PILImage
+        pil_img = PILImage.open(io.BytesIO(contents)).convert("RGB")
+        img_tensor = CLIP_PREPROCESS(pil_img).unsqueeze(0)
+        if CLIP_MODEL is not None:
+            with torch.no_grad():
+                img_features = CLIP_MODEL.encode_image(img_tensor)
+                img_features = img_features / img_features.norm(dim=-1, keepdim=True)
+                # 轉成 list，之後比對縮圖用
+                query_vector = img_features[0].tolist()
+    except Exception as e:
+        print(f"[CLIP] Error: {e}")
+        query_vector = None
+    
+    # ── 2. OCR 讀取圖片上的文字 ──
+    ocr_text = ""
+    try:
+        if OCR_READER is not None:
+            result = OCR_READER.ocr(contents)
+            texts = [line[1][0] for line in result[0]] if result and result[0] else []
+            if texts:
+                ocr_text = " ".join(texts)
+    except Exception as e:
+        print(f"[OCR] Error: {e}")
+    
+    # ── 3. 決定搜尋方式 ──
+    # 如果沒有 CLIP，用 Vision API 備用
+    if not keyword and not ocr_text:
+        keyword = "熱門影片"
+    
+    # 合併關鍵字：OCR 優先（因為有型號）, CLIP 描述輔助
+    search_keyword = ocr_text
+    if clip_desc and clip_desc not in search_keyword:
+        search_keyword = (clip_desc + " " + search_keyword).strip()
+    if not search_keyword:
+        search_keyword = keyword if keyword else "熱門影片"
+    
+    # ── 4. 搜尋各平台 ──
+    results = []
+    seen = set()
+    platforms_to_search = ["YouTube", "B站", "抖音", "TikTok"]
+    if platform != "全網":
+        platforms_to_search = [platform]
+    
+    all_platform_results = {}
+    for p in platforms_to_search:
+        try:
+            if p == "抖音":
+                # 抖音用文字搜尋，因為不能直接送向量
+                r = await _search_douyin(search_keyword, count)
+                pl = "抖音"
+            elif p == "TikTok":
+                r = await _search_tiktok(search_keyword, count)
+                pl = "TikTok"
+            elif p == "B站":
+                rj = await _search_bilibili(search_keyword, count)
+                if isinstance(rj, JSONResponse):
+                    rd = json.loads(rj.body)
+                    r = rd.get("results", [])
+                else:
+                    r = []
+                pl = "B站"
+            else:
+                r = await _search_youtube(search_keyword, count)
+                pl = "YouTube"
+            
+            all_platform_results[pl] = len(r) if isinstance(r, list) else 0
+            for v in (r if isinstance(r, list) else []):
+                v["platform"] = pl
+                uid = v.get("url", "") or v.get("id", "")
+                if uid and uid not in seen:
+                    seen.add(uid)
+                    results.append(v)
+        except Exception as e:
+            all_platform_results[p] = 0
+            print(f"[Search {p}] Error: {e}")
+    
+    # ── 5. 下載縮圖 + CLIP 比對（如果有 query_vector）──
+    scored_results = []
+    if query_vector:
+        for v in results:
+            thumb_url = v.get("thumbnail", "")
+            if thumb_url:
+                try:
+                    async with httpx.AsyncClient(timeout=5) as c:
+                        resp = await c.get(thumb_url)
+                        if resp.status_code == 200:
+                            thumb_img = PILImage.open(io.BytesIO(resp.content)).convert("RGB")
+                            thumb_tensor = CLIP_PREPROCESS(thumb_img).unsqueeze(0)
+                            with torch.no_grad():
+                                thumb_feat = CLIP_MODEL.encode_image(thumb_tensor)
+                                thumb_feat = thumb_feat / thumb_feat.norm(dim=-1, keepdim=True)
+                                sim = (torch.tensor(query_vector) * thumb_feat[0]).sum().item()
+                                v["visual_score"] = round(sim, 4)
+                except:
+                    v["visual_score"] = 0
+            else:
+                v["visual_score"] = 0
+            scored_results.append(v)
+        # 依視覺相似度排序
+        scored_results.sort(key=lambda x: x.get("visual_score", 0), reverse=True)
+    else:
+        scored_results = results
+    
+    elapsed = round(time.time() - start_time, 2)
+    return JSONResponse({
+        "success": True,
+        "keyword_detected": search_keyword,
+        "ocr_text": ocr_text,
+        "clip_desc": clip_desc,
+        "count": len(scored_results),
+        "results": scored_results,
+        "platform_counts": all_platform_results,
+        "elapsed": elapsed
+    })
 
-    result = await search_all(keyword=keyword, count=count) if platform == "全網" \
-             else await search(keyword=keyword, platform=platform, count=count * 2)
-
-    data = json.loads(result.body)
-    data["keyword_detected"] = keyword
-    data["vision_labels"] = labels
-    return JSONResponse(data)
-
-# ── URL 預覽 ──────────────────────────────────────────────
 @app.get("/api/video-info")
 async def video_info(url: str):
     real_url = await resolve_short_url(url)
