@@ -2546,4 +2546,4 @@ def _clip_worker():
         CLIP_DATA["error"] = str(e)
         print(f"[CLIP] Error: {e}")
 
-_thr.Thread(target=_clip_worker, daemon=True).start()
+_clip_worker()
