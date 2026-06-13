@@ -1521,7 +1521,19 @@ async def search_by_image(
     import base64, httpx
     contents = await file.read()
     b64      = base64.b64encode(contents).decode()
-    keyword  = "影片"
+    keyword  = ""
+    clip_model, clip_preprocess = get_clip()
+    if clip_model is not None:
+        try:
+            from PIL import Image as PILImage
+            import io
+            pil_img = PILImage.open(io.BytesIO(contents)).convert("RGB")
+            img_tensor = clip_preprocess(pil_img).unsqueeze(0)
+            with torch.no_grad():
+                features = clip_model.encode_image(img_tensor)
+                features = features / features.norm(dim=-1, keepdim=True)
+        except:
+            pass
     vision_model = model if model in VISION_MODELS else DEFAULT_VISION_MODEL
     try:
         async with httpx.AsyncClient(timeout=60) as client:
@@ -2507,30 +2519,6 @@ def open_browser():
     webbrowser.open("http://127.0.0.1:7788")
 
 from search_module import router as search_router
-CLIP_MODEL = None
-CLIP_PREPROCESS = None
-CLIP_AVAILABLE = False
-try:
-    import open_clip
-    import torch
-    CLIP_AVAILABLE = True
-except:
-    pass
-
-def get_clip():
-    global CLIP_MODEL, CLIP_PREPROCESS, CLIP_AVAILABLE
-    if CLIP_MODEL is not None:
-        return CLIP_MODEL, CLIP_PREPROCESS
-    if not CLIP_AVAILABLE:
-        return None, None
-    try:
-        CLIP_MODEL, _, CLIP_PREPROCESS = open_clip.create_model_and_transforms("ViT-L-14", pretrained="openai")
-        CLIP_MODEL.eval()
-        print("[CLIP] ViT-L-14 loaded")
-    except Exception as e:
-        CLIP_AVAILABLE = False
-        print(f"[CLIP] Error: {e}")
-    return CLIP_MODEL, CLIP_PREPROCESS
 app.include_router(search_router)
 
 if __name__ == "__main__":
