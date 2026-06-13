@@ -312,6 +312,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
       </div>
       <div class="hero-action">
         <button class="hero-tab-dls" onclick="showDls()">📁 已下載</button>
+<button class="hero-btn-guide" onclick="shareSite()" style="margin-left:4px">🔗 分享</button>
         <button class="hero-tab-dls" onclick="toggleHistory()" style="margin-left:8px">📋 記錄</button>
       </div>
     </div>
@@ -449,11 +450,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 
 </div><!-- /search-area -->
 
+<div style="color:#fbbf24;font-size:0.7rem;margin-bottom:8px;padding:4px 8px;background:rgba(251,191,36,0.1);border-radius:4px">⚠️ LINE/微信開啟時，下載功能請使用手機瀏覽器或電腦瀏覽器開啟本網站</div>
+
+<!-- ══ 平台統計表（永遠顯示）══ -->
+<div id="platform-stats" style="max-width:640px;margin:0 auto;padding:0 20px 8px">
+  <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:0.75rem;color:#94a3b8">
+    <span>📊 搜尋統計：</span>
+  </div>
+    <span id="st-YouTube">YouTube: <b>0</b></span>
+    <span id="st-B站">B站: <b>0</b></span>
+    <span id="st-抖音">抖音: <b>0</b></span>
+    <span id="st-TikTok">TikTok: <b>0</b></span>
+    <span style="color:#5eead4" id="st-total">總共: <b>0</b> 筆</span>
+  </div>
+</div>
+<div style="max-width:640px;margin:0 auto;padding:0 20px 4px;color:#fbbf24;font-size:0.7rem">⚠️ LINE/微信開啟時，下載功能請使用手機瀏覽器或電腦瀏覽器</div>
 <!-- ══ RESULTS ══ -->
+
+    <div style="background:#0b1a18;border:1px solid #0d2420;border-radius:8px;height:60px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:#1d4a45">廣告區 1</div>
+    <div style="background:#0b1a18;border:1px solid #0d2420;border-radius:8px;height:60px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:#1d4a45">廣告區 2</div>
+    <div style="background:#0b1a18;border:1px solid #0d2420;border-radius:8px;height:60px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:#1d4a45">廣告區 3</div>
+  </div>
+</div>
 <div class="results-wrap" id="results-wrap" style="display:none">
   <div class="results-label" id="results-label">搜尋結果</div>
   <div style="text-align:center" id="kw-badge-wrap"></div>
   <div class="grid" id="g-results"></div>
+  </div>
 </div>
 
 </div><!-- /page-search -->
@@ -844,6 +867,7 @@ function makeCard(v,i){
 let searchPageToken = {};
 
 async function doSearch(){
+  currentPage=1;
   const kw=document.getElementById('kw').value.trim();
   if(!kw){ toast('請輸入關鍵字',true); return; }
   if(!activePlts.size){ toast('請至少勾選一個平台',true); return; }
@@ -896,14 +920,14 @@ async function doSearch(){
   // Search complete summary
   let summaryHtml = '<div style="margin-top:12px;padding:8px 12px;background:#0b1a18;border:1px solid #0d2420;border-radius:8px;font-size:0.75rem">';
   summaryHtml += '<span style="color:#5eead4">✅ 搜尋完成！</span>';
-  let totalFound = 0;
+  let platformCounts={};
   const statusDiv = document.getElementById('search-status');
   if(statusDiv){
     const spans = statusDiv.querySelectorAll('span');
     spans.forEach(sp => {
       const txt = sp.textContent || '';
       const match = txt.match(/(\d+) 筆/);
-      if(match) totalFound += parseInt(match[1]);
+      if(match){platformCounts[p]=parseInt(match[1]);totalFound+=parseInt(match[1]);}
     });
   }
   summaryHtml += ' <span style="color:#94a3b8">共 <b style="color:#5eead4">'+totalFound+'</b> 筆結果</span>';
@@ -981,9 +1005,6 @@ async function doImgSearch(){
   finally{ document.getElementById('btn-is').disabled=false; }
 }
 
-function hideResults(){ document.getElementById('results-wrap').style.display='none'; document.getElementById('g-results').innerHTML=''; sel.clear(); updBar(); }
-
-function renderResults(list,label,badge){
   document.getElementById('results-label').textContent=label;
   document.getElementById('kw-badge-wrap').innerHTML=badge?`<span class="kw-badge">🤖 ${badge}</span>`:'';
   const g=document.getElementById('g-results');
@@ -1741,10 +1762,31 @@ if(isMobile()){
     }
   }catch(e){}
 })();
+// ── 分頁 + 統計 + 分享 ──
+var currentPage=1;var PAGE_SIZE=20;
+function updatePagination(){var total=results.length;var tp=Math.ceil(total/PAGE_SIZE)||1;
+  if(tp<=1){document.getElementById("pagination").style.display="none";return;}
+  document.getElementById("pagination").style.display="block";
+  document.getElementById("pg-info").textContent="第 "+currentPage+"/"+tp+" 頁";
+  document.getElementById("btn-prev").style.opacity=currentPage<=1?"0.3":"1";
+  document.getElementById("btn-prev").disabled=currentPage<=1;
+  document.getElementById("btn-next").style.opacity=currentPage>=tp?"0.3":"1";
+  document.getElementById("btn-next").disabled=currentPage>=tp;}
+function showPage(p){currentPage=p;var start=(p-1)*PAGE_SIZE;var end=start+PAGE_SIZE;
+  var g=document.getElementById("g-results");
+  g.innerHTML=results.slice(start,end).map(function(v,i){return makeCard(v,start+i)}).join("");
+  updatePagination();}
+function nextPage(){var tp=Math.ceil(results.length/PAGE_SIZE);if(currentPage<tp)showPage(currentPage+1);}
+function prevPage(){if(currentPage>1)showPage(currentPage-1);}
+function shareSite(){if(navigator.share){navigator.share({title:"影片搜尋下載工具",url:"https://cc.v8i8.com"}).catch(function(){})}else{navigator.clipboard.writeText("https://cc.v8i8.com").then(function(){toast("✅ 網址已複製")}).catch(function(){})}}
+function updatePlatformStats(pc){var plat=["YouTube","B站","抖音","TikTok"];var t=0;
+  plat.forEach(function(p){var c=pc[p]||0;t+=c;var el=document.getElementById("st-"+p);if(el)el.innerHTML=p+": <b>"+c+"</b>"});
+  var tel=document.getElementById("st-total");if(tel)tel.innerHTML="總共: <b>"+t+"</b> 筆";}
 </script>
 
-<!-- ══ HISTORY MODAL ══ -->
-<div id="hist-modal" class="hide">
+// ── 分頁相關 ──
+const PAGE_SIZE = 20;
+
   <div id="hist-box">
     <div class="hist-head">
       <span style="color:#d1fae5;font-weight:700;font-size:0.9rem">📋 使用記錄</span>

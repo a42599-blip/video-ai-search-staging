@@ -1516,7 +1516,7 @@ def get_vision_models():
 async def search_by_image(
     file:    UploadFile = File(...),
     platform: str = Form("全網"),
-    count:   int  = Form(6),
+    count:   int  = Form(999),
     model:   str  = Form(DEFAULT_VISION_MODEL),
 ):
     import base64, httpx
