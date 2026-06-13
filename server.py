@@ -1521,19 +1521,7 @@ async def search_by_image(
     import base64, httpx
     contents = await file.read()
     b64      = base64.b64encode(contents).decode()
-    keyword  = ""
-    clip_model, clip_preprocess = get_clip()
-    if clip_model is not None:
-        try:
-            from PIL import Image as PILImage
-            import io
-            pil_img = PILImage.open(io.BytesIO(contents)).convert("RGB")
-            img_tensor = clip_preprocess(pil_img).unsqueeze(0)
-            with torch.no_grad():
-                features = clip_model.encode_image(img_tensor)
-                features = features / features.norm(dim=-1, keepdim=True)
-        except:
-            pass
+    keyword  = "影片"
     vision_model = model if model in VISION_MODELS else DEFAULT_VISION_MODEL
     try:
         async with httpx.AsyncClient(timeout=60) as client:
@@ -2524,3 +2512,22 @@ app.include_router(search_router)
 if __name__ == "__main__":
     threading.Thread(target=open_browser, daemon=True).start()
     uvicorn.run(app, host="0.0.0.0", port=7788)
+
+# ── CLIP 輔助（Lazy Load）──
+import threading as _thr
+CLIP_DATA = {"model": None, "preprocess": None, "ready": False, "error": None}
+
+def _clip_worker():
+    try:
+        import open_clip, torch
+        m, _, p = open_clip.create_model_and_transforms("ViT-B-32", pretrained="openai")
+        m.eval()
+        CLIP_DATA["model"] = m
+        CLIP_DATA["preprocess"] = p
+        CLIP_DATA["ready"] = True
+        print("[CLIP] ViT-B-32 loaded")
+    except Exception as e:
+        CLIP_DATA["error"] = str(e)
+        print(f"[CLIP] Error: {e}")
+
+_thr.Thread(target=_clip_worker, daemon=True).start()
