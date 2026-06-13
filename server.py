@@ -98,7 +98,6 @@ async def resolve_short_url(url: str) -> str:
     text_url = extract_url_from_text(url)
     SHORT_DOMAINS = ("v.douyin.com", "v.kuaishou.com", "kuaishou.app.link",
                      "xhslink.com", "t.co", "vm.tiktok.com", "vt.tiktok.com")
-CLIP_HELPER = None
     if any(d in text_url for d in SHORT_DOMAINS):
         try:
             async with httpx.AsyncClient(follow_redirects=True, timeout=12,
