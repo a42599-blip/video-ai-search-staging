@@ -361,6 +361,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
           <div>
             <div class="tcard-name">圖片搜尋</div>
             <div class="tcard-hint">上傳圖片，AI 自動識別後全網搜尋</div>
+              <div style="font-size:0.65rem;color:#1d4a45;margin-top:4px">🔍 搜尋：YouTube · B站 · 抖音 · TikTok</div>
           </div>
         </div>
         <div class="tcard-body">
@@ -393,6 +394,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
           <div>
             <div class="tcard-name">URL 直接下載</div>
             <div class="tcard-hint">貼上連結，去水印下載原畫質</div>
+              <div style="font-size:0.65rem;color:#1d4a45;margin-top:4px">⬇️ 下載：抖音 · TikTok · B站 · YouTube · 小紅書 · 蝦皮短影音</div>
           </div>
         </div>
         <div class="tcard-body">
@@ -456,7 +458,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 <div id="platform-stats" style="max-width:640px;margin:0 auto;padding:0 20px 8px">
   <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:0.75rem;color:#94a3b8">
     <span>📊 搜尋統計：</span>
-  </div>
+    <span id="st-YouTube">YouTube: <b>0</b></span>
+    <span id="st-B站">B站: <b>0</b></span>
+    <span id="st-抖音">抖音: <b>0</b></span>
+    <span id="st-TikTok">TikTok: <b>0</b></span>
+    <span style="color:#5eead4" id="st-total">總共: <b>0</b> 筆</span>
+<!-- ══ 平台統計表（永遠顯示）══ -->
+<div id="platform-stats" style="max-width:640px;margin:0 auto;padding:8px 20px 4px">
+  <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:0.75rem;color:#94a3b8">
+    <span>📊 搜尋統計：</span>
     <span id="st-YouTube">YouTube: <b>0</b></span>
     <span id="st-B站">B站: <b>0</b></span>
     <span id="st-抖音">抖音: <b>0</b></span>
@@ -464,22 +474,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
     <span style="color:#5eead4" id="st-total">總共: <b>0</b> 筆</span>
   </div>
 </div>
-<div style="max-width:640px;margin:0 auto;padding:0 20px 4px;color:#fbbf24;font-size:0.7rem">⚠️ LINE/微信開啟時，下載功能請使用手機瀏覽器或電腦瀏覽器</div>
 <!-- ══ RESULTS ══ -->
 
-    <div style="background:#0b1a18;border:1px solid #0d2420;border-radius:8px;height:60px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:#1d4a45">廣告區 1</div>
-    <div style="background:#0b1a18;border:1px solid #0d2420;border-radius:8px;height:60px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:#1d4a45">廣告區 2</div>
-    <div style="background:#0b1a18;border:1px solid #0d2420;border-radius:8px;height:60px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:#1d4a45">廣告區 3</div>
-  </div>
-</div>
 <div class="results-wrap" id="results-wrap" style="display:none">
-  <div class="results-label" id="results-label">搜尋結果</div>
-  <div style="text-align:center" id="kw-badge-wrap"></div>
-  <div class="grid" id="g-results"></div>
-  </div>
-</div>
 
-</div><!-- /page-search -->
 
 <!-- ══ DOWNLOADS PAGE ══ -->
 <div id="page-dls" style="display:none">
@@ -489,20 +487,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
       <div style="display:flex;gap:8px">
         <button class="hero-btn-guide" onclick="loadDls()" style="font-size:0.75rem">🔄 重新整理</button>
         <button class="hero-tab-dls" onclick="showSearch()" style="font-size:0.75rem">← 返回搜尋</button>
-      </div>
-    </div>
-    <div id="dls-list"><div class="dls-empty">載入中...</div></div>
-  </div>
-</div>
 
 <!-- ══ BOTTOM BAR ══ -->
 <div class="bar hide" id="bar">
-  <div class="bar-info">已選 <b id="sel-n">0</b> 部影片</div>
   <div class="bar-btns">
     <button class="bar-btn btn-teal" onclick="sel.clear();document.querySelectorAll('.card').forEach(c=>c.classList.remove('sel'));document.querySelectorAll('.chk').forEach(c=>c.textContent='');updBar()">取消</button>
     <button class="bar-btn btn-green" id="btn-dla" onclick="dlAll()">⬇️ 批量去水印下載</button>
-  </div>
-</div>
 
 <!-- ══ MODAL ══ -->
 <div class="ov hide" id="ov" onclick="closeMod(event)">
@@ -512,26 +502,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
     <img id="m-img" class="m-img" style="display:none">
     <video id="m-vid" class="m-img" style="display:none" controls playsinline></video>
     <div class="m-body">
-      <div class="m-title" id="m-title"></div>
-      <div class="m-meta" id="m-meta"></div>
       <div id="m-url-row" style="display:none;margin:6px 0">
         <button id="m-copy-url-btn" onclick="copyUrlBtn(this)" style="width:100%;padding:5px 10px;border-radius:7px;border:1px solid #155e56;background:#042f2e;color:#5eead4;font-size:0.72rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:6px">
           <span id="m-url-text" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;text-align:left;color:#2d8a7a"></span>
           <span style="flex-shrink:0;color:#10b981;font-weight:600">🔗 複製網址</span>
         </button>
-      </div>
       <div id="m-quality-sel" style="display:none;margin-bottom:8px">
-        <div style="font-size:0.72rem;color:#6ee7b7;margin-bottom:5px">選擇畫質</div>
-        <div id="m-quality-btns" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-      </div>
       <div class="m-btns" id="m-btns">
         <button class="m-btn btn-teal" id="btn-msel" onclick="togSelCur()">勾選</button>
         <button class="m-btn btn-green" id="btn-mdl" onclick="dlCur()">⬇️ 去水印下載</button>
-      </div>
-      <div id="m-prog" class="dl-prog"></div>
-    </div>
-  </div>
-</div>
 
 <!-- ══ COOKIES MODAL ══ -->
 <div class="guide-modal hide" id="cookies-modal" onclick="if(event.target===this)toggleCookies()">
@@ -539,16 +518,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
     <div class="guide-head">
       <h3>🍪 平台 Cookies 設定</h3>
       <button class="guide-close" onclick="toggleCookies()">✕</button>
-    </div>
     <div style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">
       <div style="font-size:0.75rem;color:#5eead4;background:#0a1f1a;border:1px solid #0d3a20;border-radius:8px;padding:10px 12px;line-height:1.7">
         <b style="color:#99f6e4">為什麼需要 Cookies？</b><br>
         抖音／快手／TikTok 會封鎖無登入的搜尋請求。貼上你的 Cookies 後，工具會用你的帳號身份搜尋。<br>
         <b style="color:#fbbf24">建議做法：</b>在 Edge 安裝 <b style="color:#fff">「Cookie Editor」</b> 擴充功能 → 登入平台 → 點擴充圖示 → Export → 複製全部貼到下方。
-      </div>
-      <div id="ck-status" style="display:flex;gap:8px;flex-wrap:wrap"></div>
-      <div>
-        <div style="font-size:0.8rem;color:#5eead4;font-weight:600;margin-bottom:6px">選擇平台</div>
         <select class="sel" id="ck-platform" style="width:100%;margin-bottom:8px">
           <option value="douyin">抖音 (douyin.com)</option>
           <option value="kuaishou">快手 (kuaishou.com)</option>
@@ -558,12 +532,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
         <div style="display:flex;gap:8px;margin-top:8px">
           <button class="btn btn-teal" onclick="saveCookies()" style="flex:2;padding:8px">✅ 儲存 Cookies</button>
           <button class="btn" onclick="delCookies()" style="flex:1;padding:8px;background:#141420;border:1px solid #3b1515;color:#f87171">🗑️ 清除</button>
-        </div>
-        <div id="ck-msg" style="font-size:0.72rem;margin-top:6px;color:#34d399;display:none"></div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ══ SETTINGS MODAL ══ -->
 <div class="guide-modal hide" id="settings-modal" onclick="if(event.target===this)toggleSettings()">
@@ -571,24 +539,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
     <div class="guide-head">
       <h3>⚙️ 管理員設定</h3>
       <button class="guide-close" onclick="toggleSettings()">✕</button>
-    </div>
     <div style="padding:20px;display:flex;flex-direction:column;gap:20px">
 
       <!-- 下載路徑（桌機才顯示） -->
       <div id="settings-path-section">
-        <div style="font-size:0.82rem;color:#5eead4;font-weight:600;margin-bottom:8px">📂 下載儲存位置</div>
         <div style="background:#060f0f;border:1px solid #0d2420;border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px">
-          <div style="flex:1;font-size:0.8rem;color:#0d9488;word-break:break-all" id="settings-path-display"></div>
           <button class="btn btn-teal" onclick="pickFolderFromSettings()" style="padding:8px 14px;white-space:nowrap;flex-shrink:0">📁 選擇資料夾</button>
-        </div>
-        <div style="font-size:0.7rem;color:#1d4a45;margin-top:6px">點「選擇資料夾」用滑鼠點選，不用手動輸入路徑</div>
-      </div>
 
       <!-- Cookies 設定（管理員功能） -->
-      <div>
-        <div style="font-size:0.82rem;color:#f87171;font-weight:600;margin-bottom:4px">🍪 平台登入 Cookies（管理員）</div>
-        <div style="font-size:0.7rem;color:#1d4a45;margin-bottom:8px">設定後，抖音 / 快手 / TikTok URL 解析可繞過驗證限制</div>
-        <div id="ck-status" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"></div>
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
           <select class="sel" id="ck-platform" style="flex:1">
             <option value="douyin">抖音 douyin.com</option>
@@ -596,15 +554,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
             <option value="tiktok">TikTok tiktok.com</option>
           </select>
           <button class="btn" onclick="delCookies()" style="padding:7px 12px;background:#141420;border:1px solid #3b1515;color:#f87171;font-size:0.75rem">🗑️ 清除</button>
-        </div>
         <textarea class="inp" id="ck-json" placeholder='用 Edge 擴充「Cookie-Editor」匯出 JSON，貼在這裡' rows="4" style="resize:vertical;font-size:0.7rem;font-family:monospace;line-height:1.4"></textarea>
         <button class="btn btn-teal" onclick="saveCookies()" style="width:100%;padding:8px;margin-top:6px">✅ 儲存 Cookies</button>
-        <div id="ck-msg" style="font-size:0.72rem;margin-top:6px;color:#34d399;display:none"></div>
-      </div>
 
-    </div>
-  </div>
-</div>
 
 <!-- ══ GUIDE MODAL ══ -->
 <div class="guide-modal hide" id="guide-modal" onclick="if(event.target===this)toggleGuide()">
@@ -612,7 +564,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
     <div class="guide-head">
       <h3>📖 使用說明</h3>
       <button class="guide-close" onclick="toggleGuide()">✕</button>
-    </div>
     <div class="guide-body">
       <div class="gcol">
         <h4>🔍 關鍵字搜尋</h4>
@@ -623,9 +574,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
           3. 點「搜尋」，同時跑所有勾選的平台<br>
           4. 結果顯示在下方，點卡片預覽<br>
           5. 勾選多部後點底欄批量下載
-        </div>
-        <div class="gwarn">⚠️ TikTok / 快手 / 抖音 改用 Edge 模擬真人繞過驗證碼，每平台需 10–20 秒。全選時同時啟動 3 個瀏覽器，較慢屬正常。失敗時改用 URL 直接下載。</div>
-      </div>
       <div class="gcol">
         <h4>🖼️ 圖片搜尋</h4>
         <div class="gstep">
@@ -635,9 +583,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
           &nbsp;&nbsp;&nbsp;圖片內容轉成關鍵字<br>
           3. 選擇要搜的平台<br>
           4. 點「AI 圖片搜尋」，全網找相關影片
-        </div>
-        <div class="gtip">✅ 適合：看到商品、人物、場景，想找相關影片時用</div>
-      </div>
       <div class="gcol">
         <h4>🔗 URL 直接下載</h4>
         <div class="gstep">
@@ -645,13 +590,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
           2. 貼到「URL直接下載」卡片<br>
           3. 點「預覽影片」確認內容<br>
           4. 點「去水印下載」完成
-        </div>
-        <div class="gtip">✅ 支援：抖音、TikTok、快手、小紅書、<strong>蝦皮短影音</strong></div>
-        <div style="font-size:0.68rem;color:#1d4a45;margin-top:8px">📂 存到：D:\影片搜尋下載工具\下載影片\</div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <script>
 const API=window.location.pathname.startsWith('/video-tool')?'/video-tool':'';
@@ -843,24 +781,16 @@ function syncAllBtn(){ const b=document.getElementById('plt-all'); if(b) b.class
 /* ── 卡片 HTML 產生器（供即時插入用）── */
 function makeCard(v,i){
   return `<div class="card" id="c-${i}" onclick="openPrev(${i})">
-    <div class="chk" id="chk-${i}"></div>
     ${v.thumbnail?`<img class="thumb" src="${esc(v.thumbnail)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">`:
-      `<div class="thumb-ph">🎬</div>`}
     <div class="cinfo">
-      <div class="ctitle">${esc(v.title)}</div>
       <div class="cmeta">
         <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px">${v.uploader?esc(v.uploader.slice(0,14)):''}</span>
         <span class="ptag ${ptag(v.platform)}">${v.platform}</span>
-      </div>
-      ${v.duration?`<div style="font-size:.6rem;color:#1d4a45;margin-top:2px">${fmtD(v.duration)}</div>`:''}
       <div style="margin-top:5px;border-top:1px solid #0a1f1a;padding-top:5px" onclick="event.stopPropagation()">
         <button class="copy-url-btn" data-url="${esc(v.url)}" onclick="copyUrlBtn(this)" style="width:100%;padding:4px 8px;border-radius:6px;border:1px solid #155e56;background:#042f2e;color:#5eead4;font-size:0.68rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:4px">
           <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;text-align:left;color:#2d8a7a">${esc(shortUrl(v.url))}</span>
           <span style="flex-shrink:0;color:#10b981;font-weight:600">🔗 複製</span>
         </button>
-      </div>
-    </div>
-  </div>`;
 }
 
 /* ── 關鍵字搜尋（即時顯示，各平台並行+逐步插入）── */
@@ -888,7 +818,6 @@ async function doSearch(){
   // Search status bar (per platform)
   let statusHtml = '<div id="search-status" style="margin-bottom:10px;font-size:0.78rem;line-height:1.8">';
   plts.forEach(p => { statusHtml += '<span id="st-'+p+'" style="color:#1d4a45;margin-right:12px">⏳ '+p+' 等待中...</span>'; });
-  statusHtml += '</div>';
   g.insertAdjacentHTML('beforeend', statusHtml);
   setSt('text',`<span class="spin"></span>搜尋中（${plts.join(' · ')}）...`);
 
@@ -931,12 +860,10 @@ async function doSearch(){
     });
   }
   summaryHtml += ' <span style="color:#94a3b8">共 <b style="color:#5eead4">'+totalFound+'</b> 筆結果</span>';
-  summaryHtml += '</div>';
   g.insertAdjacentHTML('beforeend', summaryHtml);
   // Update top status with final summary
   const topSt=document.getElementById('top-search-status');
   if(topSt){ topSt.style.display='block'; topSt.innerHTML='✅ 搜尋完成: '+plts.map(pp=>{const se=document.getElementById('st-'+pp);return se?se.innerHTML:pp+' 0筆'}).join(' | '); }
-  if(!results.length){ g.innerHTML='<div class="st" style="grid-column:1/-1">沒有找到相關影片</div>'; document.getElementById('btn-s').disabled=false; return; }
 
   // ── 多因子相關度排序 ──
   const kwRaw=kw.toLowerCase().trim();
@@ -1008,7 +935,6 @@ async function doImgSearch(){
   document.getElementById('results-label').textContent=label;
   document.getElementById('kw-badge-wrap').innerHTML=badge?`<span class="kw-badge">🤖 ${badge}</span>`:'';
   const g=document.getElementById('g-results');
-  if(!list.length){ g.innerHTML='<div class="st" style="grid-column:1/-1">沒有找到相關影片</div>'; }
   else{ g.innerHTML=list.map((v,i)=>makeCard(v,i)).join(''); }
   document.getElementById('results-wrap').style.display='block';
 }
@@ -1161,14 +1087,9 @@ function _iosSaveSetup(ov, dlHref, fname, sizeHint){
   const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
   const btnLabel=isIOS?'📥 儲存到 iPhone':'📥 儲存到手機';
   ov.innerHTML=`<div style="text-align:center;padding:4px 0">
-    <div id="_ios_sv_msg" style="font-size:0.82rem;color:#6ee7b7;margin-bottom:6px">${sizeHint?'傳送中（'+sizeHint+'）請勿關閉...':'傳送中，請勿關閉...'}</div>
     <div style="background:#0a2a1a;border-radius:6px;height:8px;overflow:hidden;margin-bottom:10px">
-      <div id="_ios_sv_bar" style="height:100%;background:linear-gradient(90deg,#0d9488,#14b8a6);width:0%;transition:width .3s"></div>
-    </div>
     <button id="_ios_sv_btn" disabled style="display:block;width:100%;padding:13px;background:#1a3a38;color:#4a8a88;border-radius:12px;border:none;font-size:1rem;font-weight:700;margin-bottom:8px;cursor:not-allowed">傳送中...</button>
-    <div id="_ios_sv_st" style="font-size:0.78rem;color:#6ee7b7;min-height:20px;margin-bottom:8px;line-height:1.6"></div>
     <button onclick="document.getElementById('dl-overlay').style.display='none'" style="background:transparent;border:1px solid #065f46;color:#6ee7b7;border-radius:8px;padding:6px 20px;cursor:pointer;font-size:0.8rem">關閉</button>
-  </div>`;
   let _readyFile=null;
   // Wake Lock：防止螢幕鎖屏中斷傳輸
   let _wakeLock=null;
@@ -1299,16 +1220,13 @@ function _androidSaveSetup(ov, dlHref, fname, sizeHint){
   const safeHref=dlHref.replace(/"/g,'%22');
   const safeFname=(fname||'影片.mp4').replace(/"/g,'&quot;');
   ov.innerHTML=`<div style="text-align:center;padding:4px 0">
-    <div style="font-size:0.85rem;color:#6ee7b7;margin-bottom:14px">✅ 影片已備妥${sizeHint?' ('+sizeHint+')':''}</div>
     <a id="_adl_a" href="${safeHref}" download="${safeFname}"
        style="display:block;width:100%;padding:14px;background:linear-gradient(135deg,#059669,#10b981);color:#fff;border-radius:12px;font-size:1.05rem;font-weight:700;margin-bottom:10px;text-decoration:none;box-sizing:border-box">
       📥 下載到手機
     </a>
     <div style="font-size:0.75rem;color:#64748b;margin-bottom:10px;line-height:1.6">
       下載完成後可在通知列或「下載」資料夾找到影片
-    </div>
     <button onclick="document.getElementById('dl-overlay').style.display='none'" style="background:transparent;border:1px solid #065f46;color:#6ee7b7;border-radius:8px;padding:6px 20px;cursor:pointer;font-size:0.8rem">關閉</button>
-  </div>`;
   document.getElementById('_adl_a').addEventListener('click',function(){
     this.style.opacity='0.5'; this.style.pointerEvents='none';
     this.nextElementSibling.textContent='⬇️ 下載中，請查看通知列...';
@@ -1320,7 +1238,6 @@ async function dlVideo(url,title,cdnUrl,cdnAudioUrl,quality){
   return new Promise((resolve)=>{
     const ov=document.getElementById('dl-overlay');
     // 重建 overlay 結構（手機下載後可能已替換 innerHTML）
-    ov.innerHTML=`<div id="dl-overlay-title" style="font-size:0.78rem;color:#6ee7b7;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div><div id="dl-bar-wrap" style="background:#0a2a1a;border-radius:6px;height:10px;overflow:hidden;margin-bottom:6px"><div id="dl-bar-fill" style="height:100%;background:linear-gradient(90deg,#059669,#10b981);border-radius:6px;width:0%;transition:width .4s ease"></div></div><div id="dl-overlay-row" style="display:flex;justify-content:space-between;font-size:0.75rem"><span id="dl-pct" style="font-weight:700;color:#34d399">0%</span><span id="dl-msg" style="color:#6ee7b7;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">準備中...</span></div>`;
     const fill=document.getElementById('dl-bar-fill');
     const pctEl=document.getElementById('dl-pct');
     const msgEl=document.getElementById('dl-msg');
@@ -1504,24 +1421,15 @@ async function dlUrl(){
 /* ── 已下載倉庫 ── */
 async function loadDls(){
   const el=document.getElementById('dls-list');
-  el.innerHTML='<div class="dls-empty">載入中...</div>';
   try{
     const r=await fetch(API+'/api/downloads?device_id='+encodeURIComponent(getDeviceId()));
     const d=await r.json();
-    if(!d.length){ el.innerHTML='<div class="dls-empty">尚無已下載影片<br><small style="color:#0d2420;font-size:0.75rem">下載後檔案儲存在 D:\\影片搜尋下載工具\\下載影片\\</small></div>'; return; }
     el.innerHTML='<div class="dls-grid">'+d.map(f=>`
       <div class="dl-card" onclick="openDlVideo('${esc(API+f.url)}','${esc(f.name)}','${f.size_mb}')">
         <div class="dl-thumb-wrap">
           <video class="dl-thumb" src="${esc(API+f.url)}#t=1" preload="metadata" muted playsinline
                  onloadedmetadata="if(this.duration>1)this.currentTime=1"></video>
-          <div class="dl-play-ov"><div class="dl-play-icon">▶</div></div>
-        </div>
         <div class="dl-info">
-          <div class="dl-fname" title="${esc(f.name)}">${esc(f.name.replace(/\.[^.]+$/,''))}</div>
-          <div class="dl-fmeta"><span>${f.size_mb} MB</span><span style="color:#0d9488">▶ 播放</span></div>
-        </div>
-      </div>`).join('')+'</div>';
-  }catch(e){ el.innerHTML='<div class="dls-empty">載入失敗：'+e.message+'</div>'; }
 }
 
 function openDlVideo(url, name, sizeMb){
@@ -1680,7 +1588,6 @@ function renderHistory(){
   const logs=JSON.parse(localStorage.getItem('vt_activity_log')||'[]');
   const mine=logs.filter(r=>!r.deviceId||r.deviceId===devId);
   const list=document.getElementById('hist-list');
-  if(!mine.length){ list.innerHTML='<div style="text-align:center;color:#2d5a55;padding:24px;font-size:0.8rem">尚無使用記錄</div>'; return; }
   list.innerHTML=mine.map((r,i)=>{
     const t=_fmtLogTime(r.time);
     let icon='', summary='', extra='', showRedown=false;
@@ -1700,16 +1607,10 @@ function renderHistory(){
       icon='📌'; summary=esc(JSON.stringify(r));
     }
     return `<div class="hist-item" style="align-items:center;padding:10px 12px;gap:8px">
-      <div style="flex-shrink:0;font-size:1.1rem;width:24px;text-align:center">${icon}</div>
       <div class="hist-info" style="flex:1;min-width:0">
-        <div class="hist-title" style="font-size:0.82rem">${summary}<span style="color:#4b8b6a;font-size:0.78rem">${extra}</span></div>
-        <div class="hist-meta" style="color:#2d5a45;font-size:0.72rem">${t}</div>
-      </div>
       <div class="hist-btns">
         ${showRedown?`<button class="hist-btn" style="border-color:#0d9488;color:#5eead4;background:#042f2e" onclick="reDownload(${i})">↓ 重下</button>`:''}
         <button class="hist-btn" style="border-color:#374151;color:#6b7280;background:#111827" onclick="delHistRec(${i})">✕</button>
-      </div>
-    </div>`;
   }).join('');
 }
 
@@ -1743,7 +1644,6 @@ if(isMobile()){
   // 手機：隱藏資料夾 card，不需要 Windows 路徑
   const folderCard = document.querySelector('.tcard.c-teal');
   if(folderCard){
-    folderCard.innerHTML = `<div class="tcard-inner"><div class="tcard-head"><div class="tcard-ico ico-teal">📱</div><div><div class="tcard-name">手機下載模式</div><div class="tcard-hint">下載完成後自動傳至此裝置</div></div></div></div>`;
   }
 } else {
   renderPathDisplay();
@@ -1762,7 +1662,7 @@ if(isMobile()){
     }
   }catch(e){}
 })();
-// ── 分頁 + 統計 + 分享 ──
+
 var currentPage=1;var PAGE_SIZE=20;
 function updatePagination(){var total=results.length;var tp=Math.ceil(total/PAGE_SIZE)||1;
   if(tp<=1){document.getElementById("pagination").style.display="none";return;}
@@ -1784,7 +1684,7 @@ function updatePlatformStats(pc){var plat=["YouTube","B站","抖音","TikTok"];v
   var tel=document.getElementById("st-total");if(tel)tel.innerHTML="總共: <b>"+t+"</b> 筆";}
 </script>
 
-// ── 分頁相關 ──
+
 const PAGE_SIZE = 20;
 
   <div id="hist-box">
@@ -1793,20 +1693,11 @@ const PAGE_SIZE = 20;
       <div style="display:flex;gap:8px;align-items:center">
         <button onclick="clearAllHistory()" style="font-size:0.7rem;padding:4px 10px;border-radius:6px;border:1px solid #374151;background:#111827;color:#6b7280;cursor:pointer">清除全部</button>
         <button onclick="toggleHistory()" style="font-size:1.1rem;background:transparent;border:none;color:#6b7280;cursor:pointer;line-height:1">✕</button>
-      </div>
-    </div>
-    <div class="hist-list" id="hist-list"></div>
-  </div>
-</div>
 
 <!-- ══ 全局下載進度條 ══ -->
 <div id="dl-overlay">
-  <div id="dl-overlay-title">下載中...</div>
-  <div id="dl-bar-wrap"><div id="dl-bar-fill"></div></div>
   <div id="dl-overlay-row">
     <span id="dl-msg">準備中...</span>
     <span id="dl-pct">0%</span>
-  </div>
-</div>
 </body>
 </html>
